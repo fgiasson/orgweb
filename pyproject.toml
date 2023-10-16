@@ -23,7 +23,8 @@ classifiers = [
 ]
 dependencies = [
     "typer[all]",
-    "docker"
+    "docker",
+    "watchdog"
 ]
 
 [project.urls]

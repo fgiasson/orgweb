@@ -22,7 +22,7 @@ def tangle(folder: str, files: list=None) -> None:
         for file in os.listdir(folder):
             if file.endswith(".org") and (not files or file in files):
                 print("Tangling:", file)
-                response = container.exec_run(f"emacs --batch --eval \"(progn (setq python-indent-guess-indent-offset t) (setq python-indent-guess-indent-offset-verbose nil) (find-file \\\"/mnt/org/{file}\\\") (org-babel-tangle))\"")
+                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{file}\\\") (org-babel-tangle))\"")
                 print(response.output.decode('utf-8'))
 
         delete_container()
@@ -53,7 +53,7 @@ def detangle(folder: str, files: list=None) -> None:
             if not file.endswith(".org") and (not files or file in files):
                 org_file = file.split(".")[0] + ".org"
                 print(f"Detangling: {file} into {org_file}")
-                response = container.exec_run(f"emacs --batch --eval \"(progn (require 'org) (setq make-backup-files nil) (setq python-indent-guess-indent-offset t) (setq python-indent-guess-indent-offset-verbose nil) (org-babel-detangle \\\"/mnt/org/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
+                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
                 print(response.output.decode('utf-8'))
 
         delete_container()
