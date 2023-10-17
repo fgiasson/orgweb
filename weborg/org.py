@@ -27,10 +27,10 @@ def tangle(project_folder: str, folder: str, files: list=None) -> None:
                 print("Tangling:", file)
                 response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (org-babel-tangle))\"")
                 print(response.output.decode('utf-8'))
-
-        delete_container()
     except Exception as e:
         print("Tangling canceled:", str(e))
+    finally: 
+        delete_container()
 
 
 # To detangle a Org-file, we have to go to all tangled source files and 'org-detangle' each of them to recompose the original Org-file.
@@ -59,30 +59,19 @@ def detangle(project_folder: str, folder: str, files: list=None) -> None:
         # for each source file in the folder, detangle it
         for file in os.listdir(folder):
             if not file.endswith(".org") and (not files or file in files):
-                # org_file = file.split(".")[0] + ".org"
-                # TODO "file:org/Docker.org::" get the ORG file from the tangled file
-
-                # Extract each Org file reference from the tangled source file.
-                # This handle the scenario where multiple Org files export code
-                # in the same source file.
-                #
-                # If that source file change, we have to detangle it in all referenced Org file
-                # TODO: remove that, this scenario doesn't work with org-mode at the moment
+                # get the org file it will be detangled in. There can only
+                # be one org file per source file.
                 with open(f"{folder}/{file}", "r") as tangled_file:
-                    org_files = list(set(re.findall(r"file:(.*)::", tangled_file.read())))
-                    print(org_files)
+                    org_file = list(set(re.findall(r"file:(.*)::", tangled_file.read())))[0]
 
-                for org_file in org_files:
-                    # remove path from org_file
-                    org_file = org_file.split("/")[-1]
-                    print(f"Detangling: {file} into {org_file}")
-                    response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
-                    print(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
-                    print(response.output.decode('utf-8'))
-
-        delete_container()
+                org_file = org_file.split("/")[-1]
+                print(f"Detangling: {file} into {org_file}")
+                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
+                print(response.output.decode('utf-8'))
     except Exception as e:
         print("Detangling canceled:", str(e))
+    finally:
+        delete_container()
 
 def execute(project_folder: str, folder: str, files: list=None) -> None:
     """Execute all the code blocks in the Org files in the folder. 
@@ -103,9 +92,9 @@ def execute(project_folder: str, folder: str, files: list=None) -> None:
                 print("Execute:", file)
                 response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (setq org-confirm-babel-evaluate nil) (org-babel-execute-buffer))\"")
                 print(response.output.decode('utf-8'))
-
-        delete_container()
     except Exception as e:
         print("Execute canceled:", str(e))    
+    finally:
+        delete_container()
 
 # TODO: create a weave function to create the documentation pages, "the book"
