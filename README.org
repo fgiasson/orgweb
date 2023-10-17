@@ -5,7 +5,7 @@
 CLI Org-Mode Environment for WEB like development without Emacs
 
 
-#+BEGIN_SRC plantuml :file imgs/graph.svg
+#+BEGIN_SRC plantuml :file imgs/graph.svg :exports results
 digraph foo {
     "Foo.org" [color=green];
     "Foo.py" [color=blue];
