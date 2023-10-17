@@ -19,3 +19,19 @@ digraph foo {
 
 #+RESULTS:
 [[file:imgs/graph.svg]]
+
+#+BEGIN_SRC plantuml :file imgs/graph_2.svg :exports results
+digraph foo {
+    layout=circo;
+    "Foo.org" [color=green];
+    "Bar.org" [color=blue];
+    "FooBar.py" [color=orange];
+    "Foo.org" -> "FooBar.py" [label="tangle", color=orange, fontcolor=orange];
+    "Bar.org" -> "FooBar.py" [label="tangle", color=orange, fontcolor=orange];
+    "FooBar.py" -> "Foo.org" [label="detangle", color=green, fontcolor=green];
+    "FooBar.py" -> "Bar.org" [label="detangle", color=blue, fontcolor=blue];
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:imgs/graph_2.svg]]
