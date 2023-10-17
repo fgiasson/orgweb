@@ -39,17 +39,19 @@ class TimedDeque:
         return True
 
 class OrgFileChangeHandler(FileSystemEventHandler):
-    def __init__(self):    
+    def __init__(self, path):    
+        self.path = path
         self.queue = TimedDeque()
 
     def on_modified(self, event):
         if not os.path.isdir(event.src_path):
             if self.queue.add_event(event):
+                folder = os.path.dirname(event.src_path).replace(self.path, '').strip('/') + '/'
                 if event.src_path.endswith(".org"):
                     print('File changed, tangling:', event.src_path)
-                    tangle(os.path.dirname(event.src_path), [os.path.basename(event.src_path)])
+                    tangle(self.path, folder, [os.path.basename(event.src_path)])
                 else:
                     print('File changed, detangling:', event.src_path)
-                    detangle(os.path.dirname(event.src_path), [os.path.basename(event.src_path)])
+                    detangle(self.path, folder, [os.path.basename(event.src_path)])
             else:
                 print('File changed, but ignored:', event.src_path)

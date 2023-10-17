@@ -4,7 +4,7 @@ import typer
 from . import __version__
 from .container import *
 from .monitor import OrgFileChangeHandler
-from .org import tangle as org_tangle, detangle as org_detangle
+from .org import tangle as org_tangle, detangle as org_detangle, execute as org_execute
 from rich import print
 from typing import List
 from typing_extensions import Annotated
@@ -25,29 +25,41 @@ def config():
 
 # Example: weborg tangle 'org/' --files=test.org --files=foo.org
 @app.command()
-def tangle(folder: str = typer.Argument(..., help="The folder where the Org-mode files to tangle are located"),
+def tangle(project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"), 
+           folder: str = typer.Argument(..., help="Folder where the Org-mode files to tangle are located"),
            file: Annotated[List[str], 
                            typer.Option("--file",
                            help="Optional list of one or more files to tangle from `folder`")] = None):
     """Tangle the org files in the given folder"""
-    folder = os.path.abspath(folder)
-    org_tangle(folder, file)
+    project_folder = os.path.abspath(project_folder)
+    org_tangle(project_folder, folder, file)
 
 @app.command()
-def detangle(folder: str = typer.Argument(..., help="The folder where the source files to detangle are located"),
+def detangle(project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"), 
+             folder: str = typer.Argument(..., help="Folder where the source files to detangle are located"),
              file: Annotated[List[str], 
                            typer.Option("--file",
                            help="Optional list of one or more files to tangle from `folder`")] = None):
                            
     """Detangle the source files in the given folder"""
-    folder = os.path.abspath(folder)
-    org_detangle(folder, file)
+    project_folder = os.path.abspath(project_folder)
+    org_detangle(project_folder, folder, file)
+
+@app.command()
+def execute(project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"), 
+            folder: str = typer.Argument(..., help="Folder where the Org-mode files to execute are located"),
+            file: Annotated[List[str], 
+                            typer.Option("--file",
+                            help="Optional list of one or more files to execute from `folder`")] = None):
+    """Execute the org files in the given folder"""
+    project_folder = os.path.abspath(project_folder)
+    org_execute(project_folder, folder, file)
 
 @app.command()
 def monitor(folder: str = typer.Argument(..., help="The folder to monitor for changes")):
     """Monitor the given folder for changes and tangle the org files when they change"""
     folder = os.path.abspath(folder)
-    event_handler = OrgFileChangeHandler()
+    event_handler = OrgFileChangeHandler(folder)
     observer = Observer()
     observer.schedule(event_handler, path=folder, recursive=True)
     observer.start()
