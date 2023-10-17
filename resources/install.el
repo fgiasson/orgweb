@@ -9,3 +9,5 @@
 (package-install 'yaml-mode)
 (package-install 'dockerfile-mode)
 (package-install 'terraform-mode)
+(package-install 'graphviz-dot-mode)
+(package-install 'plantuml-mode)
