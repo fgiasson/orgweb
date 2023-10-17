@@ -22,6 +22,7 @@ The next step is to install Bash and Emacs with fixed versions. Then we create t
       apk add --no-cache emacs=28.2-r8 && \
       apk add --no-cache graphviz=8.0.5-r1 && \
       apk add --no-cache ttf-dejavu && \
+      apk add --no-cache git=2.40.1-r0 && \
       apk add --no-cache plantuml=1.2023.6-r0 && \
       mkdir ~/.emacs.d
 #+END_SRC
@@ -53,6 +54,6 @@ The last step is to install all the required packages to run =weborg=. This is d
 When the next version of Alpine will be released, we should tangle this code block in order to install the latest version of org-mode from melpa. This is only possible when Emacs 29.1 will be available in Alpine since =package-install-upgrade-built-in= is a new configuration option of Emacs 29.1. Until then, we will have to use the version of org-mode that is shipped with Emacs 28.2. Until this new configuration option is available, we can't upgrade because Org is a =built-in= package and Emacs doesn't allow to upgrade built-in packages by default.
 
 #+NAME: dockertest
-#+BEGIN_SRC dockerfile :tangle ../foo/Dockerfile :mkdirp yes
+#+BEGIN_SRC dockerfile
   RUN emacs --batch --eval "(progn (package-initialize) (package-refresh-contents) (setq package-install-upgrade-built-in t) (package-install 'org))"
 #+END_SRC
