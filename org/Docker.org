@@ -21,7 +21,7 @@ The next step is to install Bash and Emacs with fixed versions. Then we create t
   RUN apk add --no-cache bash=5.2.15-r5 && \
       apk add --no-cache emacs=28.2-r8 && \
       apk add --no-cache graphviz=8.0.5-r1 && \
-      apk add --no-cache ttf-dejavu && \
+      apk add --no-cache ttf-dejavu=2.37-r5 && \
       apk add --no-cache git=2.40.1-r0 && \
       apk add --no-cache plantuml=1.2023.6-r0 && \
       mkdir ~/.emacs.d
