@@ -1,0 +1,21 @@
+#+PROPERTY: header-args :eval yes
+
+# weborg
+
+CLI Org-Mode Environment for WEB like development without Emacs
+
+
+#+BEGIN_SRC plantuml :file imgs/graph.svg
+digraph foo {
+    "Foo.org" [color=green];
+    "Foo.py" [color=blue];
+    "Bar.py" [color=blue];
+    "Foo.org" -> "Foo.py" [label="tangle", color=blue, fontcolor=blue];
+    "Foo.org" -> "Bar.py" [label="tangle", color=blue, fontcolor=blue];
+    "Foo.py" -> "Foo.org" [label="detangle", color=green, fontcolor=green];
+    "Bar.py" -> "Foo.org" [label="detangle", color=green, fontcolor=green];
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:imgs/graph.svg]]
