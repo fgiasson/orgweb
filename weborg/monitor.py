@@ -47,6 +47,7 @@ class OrgFileChangeHandler(FileSystemEventHandler):
         if not os.path.isdir(event.src_path):
             if self.queue.add_event(event):
                 folder = os.path.dirname(event.src_path).replace(self.path, '').strip('/') + '/'
+                if folder == '/': folder = '.'
                 if event.src_path.endswith(".org"):
                     print('File changed, tangling:', event.src_path)
                     tangle(self.path, folder, [os.path.basename(event.src_path)])
