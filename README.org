@@ -74,10 +74,175 @@ WebOrg -> Emacs: Execute Command
 
 * Installing
 ** Docker
+
+If Docker is already installed in your development environment, you can skip
+this step. Otherwise, you should install Docker.
+
+[[https://docs.docker.com/desktop/][To install Docker Desktop, you simply have read and follow those instructions.]]
+
 ** From Package
-** From Sourc
+
+=weborg= is available on PyPi, you can easily install it locally by running the
+following command in your terminal:
+
+#+begin_src shell :eval no
+pip install weborg
+#+end_src
+
+** From Source
+
+If you want to improve and contribute to the project, you will first have to
+generate the sources files from the Org mode files in the repository. To do so,
+you will need =weborg= itself (installed in the previous step), or you could do
+the same if you have a local Emacs instance configured with =org-mode=. But
+let's assumes you don't.
+
+First clone the repository in your environment:
+
+#+begin_src shell :eval no
+git clone https://github.com/fgiasson/weborg.git
+#+end_src
+
+Once the repository is cloned, let's tangle all the files:
+
+#+begin_src shell :eval no
+cd weborg
+weborg tangle . org/
+weborg tangle . org/resources/
+weborg tangle . org/weborg/
+#+end_src
+
+These commands will tangle all the sources and configuration files required by
+the project.
+
+Once they have been tangle, you will be able to use make to create the
+development environment and the package to run locally.
+
+#+begin_src shell :eval no
+make install-build        # install Python's build
+make create-venv          # create the pyenv virtual environment
+make source-venv          # source that environment
+make build                # build the weborg CLI application
+make install-local-build. # install the package we just created
+#+end_src
+
+After that, you will be able to run =make rebuid-local= every time you want to
+test some changes you made to the application.
+
 * Usage
+
+** Folder Structure
+
+Each of the operation work with the same folder structure assumption. There are three main components:
+
+  1. project folder
+  2. folder
+  3. files
+
+The =project folder= is the root of the project currently being worked on.
+
+The =folder= is a where the =files= are located, within the =project folder=.
+
+The =files= is a list of one or multiple files we want to tangle.
+
+** Tangle
+
+=weborg tangle= takes a =project_folder= and a =folder= as input. The =folder=
+is where the Org files we want to tangle are located. If we want to tangle all
+the Org files from the =project_folder=, then the =folder= will have the same
+path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be tangled from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be tangled.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg tangle . foo/ --file=foo.org --file=bar.org
+
+#+end_src
+
+In that example, =weborg= will tangle the two files =/my/project/folder/foo.org=
+and =/my/project/folder/bar.org=
+
+** Detangle
+
+=weborg detangle= takes a =project_folder= and a =folder= as input. The =folder=
+is where the source files we want to detangle are located. If we want to
+detangle all the source files from the =project_folder=, then the =folder= will
+have the same path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be detangled from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be detangled.
+
+The =detangle= command does make sure that an input source file is a file that
+was previously tangled. Otherwise, it will be ignored. It does so by checking
+the tangling markup in comments of the source file.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg detangle . foo/ --file=foo.py --file=bar.py
+
+#+end_src
+
+In that example, =weborg= will detangle the two files
+=/my/project/folder/foo.py= and =/my/project/folder/bar.py=
+
+** Execute
+
+=weborg execute= takes a =project_folder= and a =folder= as input. The =folder=
+is where the Org files we want to execute are located. If we want to execute all
+the source files from the =project_folder=, then the =folder= will have the same
+path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be executed from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be executed.
+
+The =execute= command is used to execute every code block or the Org files. This
+is normally used to execute PlantUML code blocks such that it produces graphs
+that are referrenced within Org files.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg execute . foo/ --file=foo.org
+
+#+end_src
+
+In that example, =weborg= will execute the =/my/project/folder/foo.py=
+
+** Monitor
+
+=weborg monitor= will take a folder as input and will monitor every file changes
+in that directory, recursively. If a Org file changes, it will be tangled, if a
+source file changes it will be detangled.
+
+Monitoring is used to make sure that the Org files and their source files are
+always in sync, without having the developers to carefully tangle and detangle
+every time they modify a file.
+
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg monitor .
+
+#+end_src
+
 * Tangling Workflows
+
+Let's take some time to cover the different tangling workflows that you may
+imagine.
+
+The first scenario is when you have a single Org file that tangles code blocks
+in one, or multiple, source files, such as:
 
 #+BEGIN_SRC plantuml :file imgs/graph.svg :exports results
 digraph foo {
@@ -93,6 +258,12 @@ digraph foo {
 
 #+RESULTS:
 [[file:imgs/graph.svg]]
+
+This is the workflow that is currently implemented in Org-mode. You can tangle a
+=foo.org= file in as many source files you want. Then, if you just detangle
+=Foo.py=, then only the code blocks with that code will be updated in =Foo.org=.
+
+Then you could extrapolite this case and think about the following scenario:
 
 #+BEGIN_SRC plantuml :file imgs/graph_2.svg :exports results
 digraph foo {
@@ -110,7 +281,31 @@ digraph foo {
 #+RESULTS:
 [[file:imgs/graph_2.svg]]
 
+This scenario is when you have two different Org files that tangle in the same
+source file. Then, when you detangle =FooBar.py=, you would imagine that each
+blocks would detangle in their respective Org file.
+
+However, this is not currently the case with Org mode. *This scenario is
+currently not supported and will break your literate programming workkflow*.
+
+Another thing to take care of is that the [[https://orgmode.org/manual/Noweb-Reference-Syntax.html][=noweb= syntax is not currently
+supported for the =detangle= command]]. This is a long standing issue with
+Org-mode that is discussed for several years now.
+
+You can use =noweb= only if you won't =detangle= your source files. 
+
 * Contributions
 
+We welcome contributions to WebOrg! If you’d like to contribute, please follow
+these steps:
 
+  1. Fork the repository on GitHub.
+  2. Create a new branch with a descriptive name: =git checkout -b
+     feature/your-feature-name=
+  3. Push your changes to your fork: =git push origin feature/your-feature-name=
+  4. Make your changes and commit them: =git commit -m "Add feature: your
+     feature name"=
+  5. Submit a pull request to the main branch of the original repository.
+  6. Make sure that you only commit the Org-mode files, and not the source files
+     themselves. Add them to the =make clean= method if needed.
 
