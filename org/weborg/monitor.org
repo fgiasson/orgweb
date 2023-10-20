@@ -1,0 +1,151 @@
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/monitor.py
+
+#+Title: File Changes Monitoring
+
+To understand the importance of the files monitoring concept in the context of
+=weborg=, we have to keep in mind the development workflow.
+
+=weborg= is primary intended for developers that want to use Literate
+Programming using Org-mode to develop their project without having to use Emacs.
+If the developer is already familiar with Emacs, or is willing to learn how to
+use it then =weborg= is not necessary since everything can happen automatically
+by properly configuring Emacs.
+
+However, this is the exception, and not the norm. In a context where a developer
+is using any other IDE, then monitoring file changes is essential. Every time a
+Org file, or a tangled source file, is modified, we have to run a =tangle= or
+=detangle= command to keep the Org files and their sources files synchronized.
+
+To use the monitoring capabilities of =weborg=, the developer will run it in a
+shell instance for as long as he work on the files. To start the monitoring, he
+will:
+
+#+begin_src shell :tangle no
+
+cd /my/project/folder/
+weborg monitor .
+
+#+end_src
+
+The user will move to the folder where his project is located and will tell
+=weborg= to monitor that folder and all sub-folders recursivelly.
+
+If a file is changed, then the command will detect it and will output the
+operation is is performing in reaction to the file's change:
+
+#+begin_quote
+
+➜ weborg monitor .
+File changed, tangling: /Users/frederickgiasson/git/weborg/org/weborg/monitor.org
+Tangling ['monitor.org']...
+Tangling: monitor.org
+Tangled 3 code blocks from monitor.org
+
+#+end_quote
+
+* Imports
+
+#+begin_src python
+
+import time
+import os
+from collections import deque
+from .org import tangle as tangle, detangle as detangle
+from watchdog.events import FileSystemEventHandler
+
+#+end_src
+
+* Timed Deque
+
+One of the problem we are facing with the monitoring of local file changes is
+that several different modification events can be sent by the system is a very
+small amount of time. If we don't throttle those events, the monitor will simply
+endlessly tangle and detangle files.
+
+To mitigate that reality, we created a timed deque. How it works is as follow:
+
+  1. We check what is the time of the oldest event in the queue.
+  2. If it is more than five seconds old, then we remove it from the left of the
+     queue
+  3. Then we check if the incoming event is an event that is already existing in
+     the queue, if it is, we then ignore it. We return =False=
+  4. Finally, if the incoming event if not already in the list, we add it to the
+     right of the dequeu and return =True=
+
+#+begin_src python
+
+class TimedDeque:
+    def __init__(self):
+        self.deque = deque()
+        self.oldest_event_time = None
+
+    def add_event(self, event) -> bool:
+        """Add an event to the timed deque. If the event is already in the
+        deque, return False, otherwise return True. When False is returned, it
+        is considered that the event needs to be ignored."""
+        current_time = time.time()
+
+        # remove events that are older than 5 seconds
+        while self.oldest_event_time is not None and
+              current_time - self.oldest_event_time > 5:
+            self.oldest_event_time = self.deque[0][0]
+            self.deque.popleft()
+
+            # if the deque is empty, we reset the oldest event time
+            if len(self.deque) == 0:
+                self.oldest_event_time = None
+
+        # check if the event is already in the deque
+        for event_time, event in self.deque:
+            if event == event:
+                return False
+
+        # add the event to the deque
+        self.deque.append((current_time, event))
+
+        # update the oldest event time
+        if self.oldest_event_time is None:
+            self.oldest_event_time = current_time
+
+        return True
+
+#+end_src
+
+* Org File Change Handler
+
+The file change handler is used by the [[https://github.com/gorakhargosh/watchdog][watchdog]] package. Every time a file is
+changed in the target directory, =OrgFileChangeHandler= will be called. It will
+add the incoming event to the deque, if =add_event= returns =False= then nothing
+happen, if it returns =True= then it checks if the file that changed is a Org
+file. It it is, than it tangles it. If it is not then it tries to detangle it.
+
+The =detangle= function is making sure that for every non =.org= files that are
+being monitored that they are tangled source file before running the detangling
+command.
+
+#+begin_src python
+
+class OrgFileChangeHandler(FileSystemEventHandler):
+    def __init__(self, path):
+        self.path = path
+        self.queue = TimedDeque()
+
+    def on_modified(self, event):
+        if not os.path.isdir(event.src_path):
+            if self.queue.add_event(event):
+                folder = os.path.dirname(event.src_path).replace(self.path,
+                                                                 '').strip('/') + '/'
+                if folder == '/': folder = '.'
+                if event.src_path.endswith(".org"):
+                    print('File changed, tangling:', event.src_path)
+                    tangle(self.path, folder,
+                           [os.path.basename(event.src_path)])
+                else:
+                    print('File changed, detangling:', event.src_path)
+                    detangle(self.path, folder,
+                             [os.path.basename(event.src_path)])
+            else:
+                print('File changed, but ignored:', event.src_path)
+
+#+end_src
+

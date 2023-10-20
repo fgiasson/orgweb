@@ -1,59 +1,88 @@
-#+PROPERTY: header-args :results silent :comments link
+#+PROPERTY: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../Dockerfile
 
 #+TITLE: Dockerfile
 
-This =Dockerfile= is used to build an image that has Emacs installed and configured Org-mode. This is the core of =weborg= since all the Org-mode operations are performed using that image by spawning containers for each command.
+This =Dockerfile= is used to build an image that has Emacs installed and
+configured Org-mode. This is the core of =weborg= since all the Org-mode
+operations are performed using that image by spawning containers for each
+command.
 
-The image is based on Alpine Linux 2.18.4 and uses Emacs 28.2 and Org-mode 9.5.4.
+The image is based on Alpine Linux 2.18.4 and uses Emacs 28.2 and Org-mode
+9.5.4.
 
-The first step is to use =alpine:3.18.4= as the base image. Alpine is used to minimize the size of the container and to increase its execution speed as much as possible.
+The first step is to use =alpine:3.18.4= as the base image. Alpine is used to
+minimize the size of the container and to increase its execution speed as much
+as possible.
 
-#+BEGIN_SRC dockerfile :tangle ../Dockerfile
-  FROM alpine:3.18.4
+#+BEGIN_SRC dockerfile
+
+FROM alpine:3.18.4
+
 #+END_SRC
 
-The next step is to install Bash and Emacs with fixed versions. Then we create the =.emacs.d= folder. This is where we will copy different Emacs List scripts that we use to install and run different Org-mode commands.
+The next step is to install Bash and Emacs with fixed versions. Then we create
+the =.emacs.d= folder. This is where we will copy different Emacs List scripts
+that we use to install and run different Org-mode commands.
 
- - =ttf-dejavu= is required for plantuml, otherwise it will complain with an exception during execution
+ - =ttf-dejavu= is required for plantuml, otherwise it will complain with an
+   exception during execution
  - =plantuml= is required to generate UML diagrams
 
-#+BEGIN_SRC dockerfile :tangle ../Dockerfile
-  RUN apk add --no-cache bash=5.2.15-r5 && \
-      apk add --no-cache emacs=28.2-r8 && \
-      apk add --no-cache graphviz=8.0.5-r1 && \
-      apk add --no-cache ttf-dejavu=2.37-r5 && \
-      apk add --no-cache git=2.40.1-r0 && \
-      apk add --no-cache plantuml=1.2023.6-r0 && \
-      mkdir ~/.emacs.d
+#+BEGIN_SRC dockerfile
+
+RUN apk add --no-cache bash=5.2.15-r5 && \
+    apk add --no-cache emacs=28.2-r8 && \
+    apk add --no-cache graphviz=8.0.5-r1 && \
+    apk add --no-cache ttf-dejavu=2.37-r5 && \
+    apk add --no-cache git=2.40.1-r0 && \
+    apk add --no-cache plantuml=1.2023.6-r0 && \
+    mkdir ~/.emacs.d
+
 #+END_SRC
 
-Next step is to define the working directory of the container: =/root/.emacs./=. This is where Emacs will look for different startup and configuration scripts.
+Next step is to define the working directory of the container: =/root/.emacs./=.
+This is where Emacs will look for different startup and configuration scripts.
 
 Then we copy two files to that directory:
 
- - install.el: this is the script that will install all required packages to run =weborg=
- - site-start.el: this is the script that is used by the different Org commands such as =tangle= and =detangle= to configure the emacs session that is ran from the command line.
+ - install.el: this is the script that will install all required packages to run
+   =weborg=
+ - site-start.el: this is the script that is used by the different Org commands
+   such as =tangle= and =detangle= to configure the emacs session that is ran
+   from the command line.
 
-#+BEGIN_SRC dockerfile :tangle ../Dockerfile
-  # Set the working directory within the container
-  WORKDIR /root/.emacs.d
-
-  # Copy necessary files to the container
-  COPY resources/install.el .
-  COPY resources/site-start.el .
-#+END_SRC
-
-The last step is to install all the required packages to run =weborg=. This is done by running Emacs in batch mode and by loading the =install.el= script.
-
-#+BEGIN_SRC dockerfile :tangle ../Dockerfile
-  # Set the working directory within the container
-
-  RUN emacs --load /root/.emacs.d/install.el --batch
-#+END_SRC
-
-When the next version of Alpine will be released, we should tangle this code block in order to install the latest version of org-mode from melpa. This is only possible when Emacs 29.1 will be available in Alpine since =package-install-upgrade-built-in= is a new configuration option of Emacs 29.1. Until then, we will have to use the version of org-mode that is shipped with Emacs 28.2. Until this new configuration option is available, we can't upgrade because Org is a =built-in= package and Emacs doesn't allow to upgrade built-in packages by default.
-
-#+NAME: dockertest
 #+BEGIN_SRC dockerfile
-  RUN emacs --batch --eval "(progn (package-initialize) (package-refresh-contents) (setq package-install-upgrade-built-in t) (package-install 'org))"
+
+# Set the working directory within the container
+WORKDIR /root/.emacs.d
+
+# Copy necessary files to the container
+COPY resources/install.el .
+COPY resources/site-start.el .
+
+#+END_SRC
+
+The last step is to install all the required packages to run =weborg=. This is
+done by running Emacs in batch mode and by loading the =install.el= script.
+
+#+BEGIN_SRC dockerfile
+
+# Set the working directory within the container
+RUN emacs --load /root/.emacs.d/install.el --batch
+
+#+END_SRC
+
+When the next version of Alpine will be released, we should tangle this code
+block in order to install the latest version of org-mode from melpa. This is
+only possible when Emacs 29.1 will be available in Alpine since
+=package-install-upgrade-built-in= is a new configuration option of Emacs 29.1.
+Until then, we will have to use the version of org-mode that is shipped with
+Emacs 28.2. Until this new configuration option is available, we can't upgrade
+because Org is a =built-in= package and Emacs doesn't allow to upgrade built-in
+packages by default.
+
+#+BEGIN_SRC dockerfile :tangle no
+
+RUN emacs --batch --eval "(progn (package-initialize) (package-refresh-contents) (setq package-install-upgrade-built-in t) (package-install 'org))"
+
 #+END_SRC

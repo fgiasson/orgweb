@@ -1,0 +1,250 @@
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/main.py
+
+#+Title: Main
+
+=weborg= is a command line utility that is used to use Org-mode as a Literate
+Programming framework when using another IDE than Emacs.
+
+It is used to:
+
+  - Tangle Org mode files
+  - Detangle previously tangled source files
+  - Execute Org mode files
+  - Monitor file changes on the file system to automatically tangle or detangle
+    files
+
+For a complete description of the Literate workflow using =weborg=, please read
+the README.org file.
+
+* Imports
+
+The main packages used are =typer= / =rich= to create the command line
+application and =watchdog= to monitor file changes on the file system.
+
+#+begin_src python
+
+import os
+import time
+import typer
+from . import __version__
+from .container import *
+from .monitor import OrgFileChangeHandler
+from .org import tangle as org_tangle, detangle as org_detangle, execute as org_execute
+from rich import print
+from typing import List
+from typing_extensions import Annotated
+from watchdog.observers import Observer
+
+#+end_src
+
+* Typer
+
+Start Typer such that we end-up with a command line utility.
+
+#+begin_src python
+
+app = typer.Typer()
+
+#+end_src
+
+
+* Version Command
+
+Gives the version of the currently installed =weborg= in the environment.
+=__version__= is simply imported from the module's =__init__.py= file.
+
+#+begin_src python
+
+@app.command()
+def version():
+    """Get the current installed version of weborg"""
+    print(f"Version: {__version__}")
+
+#+end_src
+
+* Config Command
+
+Gives the list of environment variables configurations available to configure
+=weborg= and their current values.
+
+#+begin_src python
+
+@app.command()
+def config():
+    """Get the current configuration of weborg"""
+    # print(f"DOCS_PATH: {os.environ.get('DOCS_PATH')}")
+
+#+end_src
+
+* Tangle Command
+
+=weborg tangle= takes a =project_folder= and a =folder= as input. The =folder=
+is where the Org files we want to tangle are located. If we want to tangle all
+the Org files from the =project_folder=, then the =folder= will have the same
+path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be tangled from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be tangled.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg tangle . foo/ --file=foo.org --file=bar.org
+
+#+end_src
+
+In that example, =weborg= will tangle the two files =/my/project/folder/foo.org=
+and =/my/project/folder/bar.org=
+
+#+begin_src python
+
+@app.command()
+def tangle(
+        project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"),
+        folder: str = typer.Argument(..., help="Folder where the Org-mode files to tangle are located"),
+        files: Annotated[List[str],
+                        typer.Option("--file", help="Optional list of one or more files to tangle from `folder`")] = None):
+    """Tangle the org files in the given folder"""
+    project_folder = os.path.abspath(project_folder)
+    org_tangle(project_folder, folder, files)
+
+#+end_src
+
+* Detangle Command
+
+=weborg detangle= takes a =project_folder= and a =folder= as input. The =folder=
+is where the source files we want to detangle are located. If we want to
+detangle all the source files from the =project_folder=, then the =folder= will
+have the same path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be detangled from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be detangled.
+
+The =detangle= command does make sure that an input source file is a file that
+was previously tangled. Otherwise, it will be ignored. It does so by checking
+the tangling markup in comments of the source file.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg detangle . foo/ --file=foo.py --file=bar.py
+
+#+end_src
+
+In that example, =weborg= will detangle the two files
+=/my/project/folder/foo.py= and =/my/project/folder/bar.py=
+
+#+begin_src python
+
+@app.command()
+def detangle(project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"),
+             folder: str = typer.Argument(..., help="Folder where the source files to detangle are located"),
+             files: Annotated[List[str],
+                           typer.Option("--file",
+                           help="Optional list of one or more files to tangle from `folder`")] = None):
+    """Detangle the source files in the given folder"""
+    project_folder = os.path.abspath(project_folder)
+    org_detangle(project_folder, folder, files)
+
+#+end_src
+
+* Execute Command
+
+=weborg execute= takes a =project_folder= and a =folder= as input. The =folder=
+is where the Org files we want to execute are located. If we want to execute all
+the source files from the =project_folder=, then the =folder= will have the same
+path as the =project_folder=.
+
+Optionally, one or multiple files can be listed. Those files are located in
+=folder=, and those are the ones that will be executed from that folder.
+
+If no file is mentioned, then all the Org files from =folder= will be executed.
+
+The =execute= command is used to execute every code block or the Org files. This
+is normally used to execute PlantUML code blocks such that it produces graphs
+that are referrenced within Org files.
+
+#+begin_src shell
+
+cd /my/project/folder/
+weborg execute . foo/ --file=foo.org
+
+#+end_src
+
+In that example, =weborg= will execute the =/my/project/folder/foo.py=
+
+#+begin_src python
+
+@app.command()
+def execute(project_folder: str = typer.Argument(..., help="Folder of the Org-mode project"), 
+            folder: str = typer.Argument(..., help="Folder where the Org-mode files to execute are located"),
+            files: Annotated[List[str],
+                            typer.Option("--file",
+                            help="Optional list of one or more files to execute from `folder`")] = None):
+    """Execute the org files in the given folder"""
+    project_folder = os.path.abspath(project_folder)
+    org_execute(project_folder, folder, files)
+
+#+end_src
+
+* Monitor Command
+
+=weborg monitor= will take a folder as input and will monitor every file changes
+in that directory, recursively. If a Org file changes, it will be tangled, if a
+source file changes it will be detangled.
+
+Monitoring is used to make sure that the Org files and their source files are
+always in sync, without having the developers to carefully tangle and detangle
+every time they modify a file.
+
+#+begin_src python
+
+@app.command()
+def monitor(folder: str = typer.Argument(..., help="The folder to monitor for changes")):
+    """Monitor the given folder for changes and tangle the org files when they change"""
+    folder = os.path.abspath(folder)
+    event_handler = OrgFileChangeHandler(folder)
+    observer = Observer()
+    observer.schedule(event_handler, path=folder, recursive=True)
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+    finally:
+        observer.stop()
+        observer.join()
+
+#+end_src
+
+* Initialize
+
+When =weborg= is ran, the first thing is checked is if the Docker image
+currently exists in the environment. If it doesn't, then the image will be
+created and then the command executed in a container of that image.
+
+If a developer changes something in the =Dockerfile= or any other files that
+affect the image, he simply has to delete the outdated image from the
+environment and rerun any =weborg= command to recreate the image from scratch.
+
+#+begin_src python
+
+def init():
+    """Initialize weborg"""
+
+    # Make sure the Docker image exists on the local system
+    if not image_exists():
+        print("Building image...")
+        image, logs = build_image()
+        print(f"Image built [{image.id}]")
+
+    app()
+
+if __name__ == "__main__":
+    init()
+
+#+end_src
+

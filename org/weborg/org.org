@@ -1,0 +1,225 @@
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/org.py
+
+#+Title: Org Commands
+
+The =weborg= command line utility is used Docker to create a Alpine Linux image
+with Emacs properly configured to be able to run different Org commands on a
+programming project folder.
+
+For each of those command, the following process will happen:
+
+  1. determine a volume to create along with the container with the project's
+     folder as the root of the volume
+  2. create a new container with that volume
+  3. run a command line =emacs= command to perform the Org command
+  4. delete the container that has been created to perform that task
+
+Creating, performing action and deleting the container is pretty fast. For the
+moment, we perform those actions for every command since it ensure a clean state
+every time.
+
+* Folder Structure
+
+Each of the operation work with the same folder structure assumption. There are three main components:
+
+  1. project folder
+  2. folder
+  3. files
+
+The =project folder= is the root of the project currently being worked on.
+
+The =folder= is a where the =files= are located, within the =project folder=.
+
+The =files= is a list of one or multiple files we want to tangle.
+
+* Imports
+
+#+begin_src python
+
+import os
+import re
+from typing import Optional
+from weborg.container import create_container, delete_container
+
+#+end_src
+
+
+* Tangle
+
+Tangling is the action of extracting source code from an Org-mode file and
+saving it to a source file that will then be compiled or interpreted.
+
+To tangle a file, =emacs= is run from the command line within the container. It
+will do the following:
+
+  1. start =emacs= by loading the =site-start.el= script.
+  2. use =find-file= to find the file to tangle and open it in the running Emacs
+     instance
+  3. tangle the file with =org-babel-tangle=
+
+#+begin_src python
+
+def tangle(project_folder: str, folder: str, files: Optional[list]=None):
+    """Every time we tangle, we create a new container and attach
+    a volume to it from the provided folder, tangle and delete
+    it in case the next tangle uses a different folder.
+    If `files` has a reference to one or more files, only
+    tangle the files, in the `folder`, that are in the `files`
+    list."""
+
+    print(f"project_folder: {project_folder}")
+    print(f"folder: {folder}")
+    print(f"files: {files}")
+    try:
+        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
+                                                         'mode': 'rw'}}
+        container = create_container(volume)
+
+        if not files:
+            print(f"Tangling {folder}...")
+        else:
+            print(f"Tangling {files}...")
+
+        # for each org file in the folder, tangle it
+        for file in os.listdir(folder):
+            if file.endswith(".org") and (not files or file in files):
+                print("Tangling:", file)
+                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (org-babel-tangle))\"")
+                print(response.output.decode('utf-8'))
+    except Exception as e:
+        print("Tangling canceled:", str(e))
+    finally:
+        delete_container()
+
+#+end_src
+
+* Detangle
+
+Detangling is the action of syhnchronizing a source code file tangled from an
+Org-file. This is a very important command since in a literate programming
+workflow, a developer may often change code from the tangled source code. Then,
+instead of copy/pasting back into the source of truth (the Org-mode file), then
+he simply has to detangle the source file.
+
+Note 1: this assumes that the comments within the tangled source files have been
+untouched. Those comments are there such that Org-mode knows where to detangled
+the source files back into the Org-mode file.
+
+Note 2: the detangling operation in Org-mode is not working if you are using
+=noweb= references in your code blocks. The =noweb= references *will not* be
+detangled in the Org-file, and then the workflow will end-up broken.
+
+To detangle a file, =emacs= is run from the command line within the container. It
+will do the following:
+
+  1. start =emacs= by loading the =site-start.el= script.
+  2. runs =org-babel-detangle=
+  3. runs =switch-to-buffer=. This is necessary to open the Org file related to
+     the detangled source file.
+  4. runs =save-buffer=. This is to save the Org file where the source code was
+     detangled. If we don't do those last two steps, then the detangling will
+     occur, but it won't be saved on the file system (changes exists in a buffer
+     only)
+
+#+begin_src python
+
+def detangle(project_folder: str, folder: str, files: Optional[list]=None):
+    """Syhnchronize the source files there have been tangled back to their
+    original Org code blocks. Code blocks needs to have the header 
+    `:comments link` or `:comments both` to be detangled. If you use
+    `:noweb yes` references, then the noweb references won't be detangled,
+    and the original Org file will be missing the noweb references. So,
+    don't use detangle until detangling with noweb is fixed in Org-mode.
+    If `files` has a reference to one or more files, only
+    tangle the files, in the `folder`, that are in the `files` 
+    list."""
+    print(f"project_folder: {project_folder}")
+    print(f"folder: {folder}")
+    print(f"files: {files}")
+
+    try:
+        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
+                                                         'mode': 'rw'}}
+        container = create_container(volume)
+
+        if not files:
+            print(f"Detangling {folder}...")
+        else:
+            print(f"Detangling {files}...")
+
+        # for each source file in the folder, detangle it
+        for file in os.listdir(folder):
+            if not file.endswith(".org") and (not files or file in files):
+                # get the org file it will be detangled in. There can only
+                # be one org file per source file.
+
+                org_file = []
+
+                with open(f"{folder}/{file}", "r") as tangled_file:
+                    org_file = list(set(re.findall(r"file:(.*)::",
+                                                   tangled_file.read())))[0]
+
+                if(len(org_file) > 0):
+                    org_file = org_file.split("/")[-1]
+                    print(f"Detangling: {file} into {org_file}")
+                    response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
+                    print(response.output.decode('utf-8'))
+    except Exception as e:
+        print("Detangling canceled:", str(e))
+    finally:
+        delete_container()
+
+#+end_src
+
+* Execute
+
+There are some kind of code blocks that we don't tangle/detangle. One good
+example of such a code block is a code block that define a PlantUML graph. What
+we want to do for those type of code blocks is to execute them such that they
+produce their side effects. In this case, the code block would generate an image
+by calling PlantUML.
+
+To execute a Org file, =emacs= is run from the command line within the
+container. It will do the following:
+
+  1. start =emacs= by loading the =site-start.el= script.
+  2. use =find-file= to find the file to tangle and open it in the running Emacs
+     instance
+  3. Set =org-confirm-babel-evaluate= to =nil=. This is necessary because Org
+     will ask the user if he really wants to execute the code blocks. Since this
+     is an automated process, we have to make sure this prompt is not displayed,
+     otherwise it will freeze the workflow.
+  4. runs =org-babel-execute-buffer= which simply execute all the code blocks
+     within the Org file.
+
+#+begin_src python
+
+def execute(project_folder: str, folder: str, files: Optional[list]=None):
+    """Execute all the code blocks in the Org files in the folder.
+    When you use this operation, it will execute all the code blocks
+    of the file(s)."""
+    try:
+        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
+                                                         'mode': 'rw'}}
+        container = create_container(volume)
+
+        if not files:
+            print(f"Execute {folder}...")
+        else:
+            print(f"Execute {files}...")
+
+        # for each org file in the folder, tangle it
+        for file in os.listdir(folder):
+            if file.endswith(".org") and (not files or file in files):
+                print("Execute:", file)
+                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (setq org-confirm-babel-evaluate nil) (org-babel-execute-buffer))\"")
+                print(response.output.decode('utf-8'))
+    except Exception as e:
+        print("Execute canceled:", str(e))
+    finally:
+        delete_container()
+
+#+end_src
+
+* TODO Weave
+

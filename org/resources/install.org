@@ -1,0 +1,44 @@
+#+PROPERTY: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../resources/install.el
+
+#+TITLE: Emacs Install.el
+
+=install.el= is used by the Dockerfile to easily install all required packages
+in Emacs. It is simpler and cleaner to maintain that ELisp file instead of
+adding a bunch of =RUN= commands with =emacs= command line calls.
+
+
+* Configure MELPA
+
+Many major modes are only available on MELPA and not in ELPA, we we have to add
+it to the vanilla Emacs instance.
+
+#+begin_src elisp
+
+(require 'package) 
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(package-initialize) 
+(package-refresh-contents)
+
+#+end_src
+
+* Install Packages
+
+If you need new package to handle non-default major modes for your Org file,
+this is where you add them. Once you added them, you will have to =make
+rebuild-local= and to delete the previous Docker image in your Docker
+environment. Finally, the next time you rerun =weborg= then the new Docker image
+will be created and the new mode will be available to Org mode.
+
+#+begin_src elisp
+
+(package-install 'use-package)
+(package-install 'yaml-mode)
+(package-install 'dockerfile-mode)
+(package-install 'terraform-mode)
+(package-install 'graphviz-dot-mode)
+(package-install 'plantuml-mode)
+(package-install 'toml-mode)
+
+#+end_src

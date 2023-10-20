@@ -1,11 +1,85 @@
-#+PROPERTY: header-args :eval yes
+#+PROPERTY: header-args :eval yes :exports results
 
-# weborg
+#+title: WebOrg: CLI Org-Mode Environment for WEB like development without Emacs
 
-CLI Org-Mode Environment for WEB like development without Emacs
+=weborg= is intended for developers that want to create literate programming
+project using Org-mode, but that *does not* want to investing time to learn how
+to use Emacs and Org-mode. If you are a developer that already uses Emacs and
+Org-mode, this tool is most likely not for you, but maybe for the people on your
+team that doesn't know, nor want to know, about Emacs.
+
+=weborg= is a very simple CLI tool that does the following:
+
+  1. =tangle= one or multiple Org files
+  2. =detangle= one or multiple source files
+  3. =execute= one or multiple Org files
+  4. =monitor= file changes on the file system to automatically =tangle= and
+     =detangle= files that changes.
+
+[[https://fgiasson.com/blog/index.php/2023/08/28/what-is-literate-programming-why/][What is Literate Programming? Why?]]
+
+If you wonder what a Literate Programming project looks like, just poke around
+this repository to have a glimps of the potential.
+
+* How does it work?
+
+=weborg= is designed in a way that developers can use all the power of Org-mode,
+in any IDE they like, without having to rely on Emacs directly.
+
+To do that, it leverages Docker to build an image where Emacs is properly
+installed and configured to implement the commands that are exposed via the
+command line tool.
+
+If the =weborg= docker image is not currently existing in the environment, then
+it will request Docker to build the image using the Dockerfile. The build
+process will install and configure all the components required to implement all
+=weborg= commands.
+
+=weborg= check if it exists every time it is invoked from the command line. This
+process will happen any time that the image is not available in the environment.
+
+#+BEGIN_SRC plantuml :file imgs/weborg_flow.svg
+
+WebOrg -> Docker: Command
+Docker -> Image: Build Image
+Image -> Emacs: Install & Configure
+
+#+END_SRC
+
+#+RESULTS:
+[[file:imgs/weborg_flow.svg]]
+
+If the image is existing in the environment, then the following will happen.
+
+=weborg= will ask Docker to create a container based on the image. Once the
+container is running, it will execute a command on the container's terminal to
+run Emacs. Emacs is used directly from the command line by evaluating ELisp code
+it gets as input.
+
+Every time a =weborg= command line is executed, a new container is created:
 
 
-#+BEGIN_SRC plantuml :file imgs/graph.svg :exports results
+#+BEGIN_SRC plantuml :file imgs/weborg_flow_2.svg
+
+WebOrg -> Docker: Run Container
+Docker -> Container: Create Container
+Image <-- Container: Uses
+WebOrg -> Emacs: Execute Command
+
+#+END_SRC
+
+#+RESULTS:
+[[file:imgs/weborg_flow_2.svg]]
+
+
+* Installing
+** Docker
+** From Package
+** From Sourc
+* Usage
+* Tangling Workflows
+
+#+BEGIN_SRC plantuml :file imgs/graph.svg
 digraph foo {
     "Foo.org" [color=green];
     "Foo.py" [color=blue];
@@ -20,7 +94,7 @@ digraph foo {
 #+RESULTS:
 [[file:imgs/graph.svg]]
 
-#+BEGIN_SRC plantuml :file imgs/graph_2.svg :exports results
+#+BEGIN_SRC plantuml :file imgs/graph_2.svg
 digraph foo {
     layout=circo;
     "Foo.org" [color=green];
@@ -35,3 +109,8 @@ digraph foo {
 
 #+RESULTS:
 [[file:imgs/graph_2.svg]]
+
+* Contributions
+
+
+
