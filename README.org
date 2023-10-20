@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :eval yes :exports results
+#+PROPERTY: header-args :eval yes
 
 #+title: WebOrg: CLI Org-Mode Environment for WEB like development without Emacs
 
@@ -38,7 +38,7 @@ process will install and configure all the components required to implement all
 =weborg= check if it exists every time it is invoked from the command line. This
 process will happen any time that the image is not available in the environment.
 
-#+BEGIN_SRC plantuml :file imgs/weborg_flow.svg
+#+BEGIN_SRC plantuml :file imgs/weborg_flow.svg :exports results
 
 WebOrg -> Docker: Command
 Docker -> Image: Build Image
@@ -59,7 +59,7 @@ it gets as input.
 Every time a =weborg= command line is executed, a new container is created:
 
 
-#+BEGIN_SRC plantuml :file imgs/weborg_flow_2.svg
+#+BEGIN_SRC plantuml :file imgs/weborg_flow_2.svg :exports results
 
 WebOrg -> Docker: Run Container
 Docker -> Container: Create Container
@@ -79,7 +79,7 @@ WebOrg -> Emacs: Execute Command
 * Usage
 * Tangling Workflows
 
-#+BEGIN_SRC plantuml :file imgs/graph.svg
+#+BEGIN_SRC plantuml :file imgs/graph.svg :exports results
 digraph foo {
     "Foo.org" [color=green];
     "Foo.py" [color=blue];
@@ -94,7 +94,7 @@ digraph foo {
 #+RESULTS:
 [[file:imgs/graph.svg]]
 
-#+BEGIN_SRC plantuml :file imgs/graph_2.svg
+#+BEGIN_SRC plantuml :file imgs/graph_2.svg :exports results
 digraph foo {
     layout=circo;
     "Foo.org" [color=green];
