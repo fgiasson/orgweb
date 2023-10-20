@@ -304,7 +304,7 @@ these steps:
      feature/your-feature-name=
   3. Push your changes to your fork: =git push origin feature/your-feature-name=
   4. Make your changes and commit them: =git commit -m "Add feature: your
-     feature name"=
+     feature name"​=
   5. Submit a pull request to the main branch of the original repository.
   6. Make sure that you only commit the Org-mode files, and not the source files
      themselves. Add them to the =make clean= method if needed.
