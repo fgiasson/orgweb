@@ -41,17 +41,6 @@ create-venv:
 
 #+end_src
 
-* source-env
-
-=make source-venv= is used to source the environment created by =create-venv=
-
-#+begin_src makefile
-
-source-venv:
-	source .venv/bin/activate
-
-#+end_src
-
 * build
 
 =make build= is used to build the =weborg= package once the virtual environment

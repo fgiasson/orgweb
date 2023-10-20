@@ -119,11 +119,11 @@ Once they have been tangle, you will be able to use make to create the
 development environment and the package to run locally.
 
 #+begin_src shell :eval no
-make install-build        # install Python's build
 make create-venv          # create the pyenv virtual environment
-make source-venv          # source that environment
+make install-build        # install Python's build
+source .venv/bin/activate # source that environment
 make build                # build the weborg CLI application
-make install-local-build. # install the package we just created
+make install-local-build  # install the package we just created
 #+end_src
 
 After that, you will be able to run =make rebuid-local= every time you want to

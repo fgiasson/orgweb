@@ -12,11 +12,6 @@ create-venv:
 	python3 -m venv .venv
 # create-env:1 ends here
 
-# [[file:org/Makefile.org::*source-env][source-env:1]]
-source-venv:
-	source .venv/bin/activate
-# source-env:1 ends here
-
 # [[file:org/Makefile.org::*build][build:1]]
 build:
 	python3 -m build
