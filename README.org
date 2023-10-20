@@ -288,8 +288,8 @@ blocks would detangle in their respective Org file.
 However, this is not currently the case with Org mode. *This scenario is
 currently not supported and will break your literate programming workkflow*.
 
-Another thing to take care of is that the [[https://orgmode.org/manual/Noweb-Reference-Syntax.html][=noweb= syntax is not currently
-supported for the =detangle= command]]. This is a long standing issue with
+Another thing to take care of is that the [[https://orgmode.org/manual/Noweb-Reference-Syntax.html][noweb syntax is not currently
+supported for the detangle command]]. This is a long standing issue with
 Org-mode that is discussed for several years now.
 
 You can use =noweb= only if you won't =detangle= your source files. 
