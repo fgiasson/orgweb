@@ -230,6 +230,8 @@ If a developer changes something in the =Dockerfile= or any other files that
 affect the image, he simply has to delete the outdated image from the
 environment and rerun any =weborg= command to recreate the image from scratch.
 
+** TODO detect if Docker is running, otherwise return a clean error.
+
 #+begin_src python
 
 def init():
