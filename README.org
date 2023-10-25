@@ -157,7 +157,7 @@ Optionally, one or multiple files can be listed. Those files are located in
 
 If no file is mentioned, then all the Org files from =folder= will be tangled.
 
-#+begin_src shell
+#+begin_src shell :eval no
 
 cd /my/project/folder/
 weborg tangle . foo/ --file=foo.org --file=bar.org
@@ -183,7 +183,7 @@ The =detangle= command does make sure that an input source file is a file that
 was previously tangled. Otherwise, it will be ignored. It does so by checking
 the tangling markup in comments of the source file.
 
-#+begin_src shell
+#+begin_src shell :eval no
 
 cd /my/project/folder/
 weborg detangle . foo/ --file=foo.py --file=bar.py
@@ -209,7 +209,7 @@ The =execute= command is used to execute every code block or the Org files. This
 is normally used to execute PlantUML code blocks such that it produces graphs
 that are referrenced within Org files.
 
-#+begin_src shell
+#+begin_src shell :eval no
 
 cd /my/project/folder/
 weborg execute . foo/ --file=foo.org
@@ -229,7 +229,7 @@ always in sync, without having the developers to carefully tangle and detangle
 every time they modify a file.
 
 
-#+begin_src shell
+#+begin_src shell :eval no
 
 cd /my/project/folder/
 weborg monitor .
