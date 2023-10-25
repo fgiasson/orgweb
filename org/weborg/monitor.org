@@ -21,10 +21,8 @@ shell instance for as long as he work on the files. To start the monitoring, he
 will:
 
 #+begin_src shell :tangle no
-
 cd /my/project/folder/
 weborg monitor .
-
 #+end_src
 
 The user will move to the folder where his project is located and will tell
@@ -34,25 +32,22 @@ If a file is changed, then the command will detect it and will output the
 operation is is performing in reaction to the file's change:
 
 #+begin_quote
-
 ➜ weborg monitor .
 File changed, tangling: /Users/frederickgiasson/git/weborg/org/weborg/monitor.org
 Tangling ['monitor.org']...
 Tangling: monitor.org
 Tangled 3 code blocks from monitor.org
-
 #+end_quote
 
 * Imports
 
 #+begin_src python
-
 import time
 import os
 from collections import deque
-from .org import tangle as tangle, detangle as detangle
+from weborg.org import tangle as tangle, detangle as detangle
+from weborg.utils import weborg_ignore
 from watchdog.events import FileSystemEventHandler
-
 #+end_src
 
 * Timed Deque
@@ -73,7 +68,6 @@ To mitigate that reality, we created a timed deque. How it works is as follow:
      right of the dequeu and return =True=
 
 #+begin_src python
-
 class TimedDeque:
     def __init__(self):
         self.deque = deque()
@@ -86,8 +80,8 @@ class TimedDeque:
         current_time = time.time()
 
         # remove events that are older than 5 seconds
-        while self.oldest_event_time is not None and
-              current_time - self.oldest_event_time > 5:
+        while (self.oldest_event_time is not None and
+               current_time - self.oldest_event_time > 5):
             self.oldest_event_time = self.deque[0][0]
             self.deque.popleft()
 
@@ -108,7 +102,6 @@ class TimedDeque:
             self.oldest_event_time = current_time
 
         return True
-
 #+end_src
 
 * Org File Change Handler
@@ -124,7 +117,6 @@ being monitored that they are tangled source file before running the detangling
 command.
 
 #+begin_src python
-
 class OrgFileChangeHandler(FileSystemEventHandler):
     def __init__(self, path):
         self.path = path
@@ -146,6 +138,5 @@ class OrgFileChangeHandler(FileSystemEventHandler):
                              [os.path.basename(event.src_path)])
             else:
                 print('File changed, but ignored:', event.src_path)
-
 #+end_src
 

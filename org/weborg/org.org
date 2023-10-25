@@ -22,27 +22,66 @@ every time.
 
 Each of the operation work with the same folder structure assumption. There are three main components:
 
-  1. project folder
-  2. folder
-  3. files
-
-The =project folder= is the root of the project currently being worked on.
+  1. folder
+  2. files
 
 The =folder= is a where the =files= are located, within the =project folder=.
+=files= can be in the parent folder or one of its child folder (if any).
 
-The =files= is a list of one or multiple files we want to tangle.
+The =files= is an optional list of one or multiple files we want to tangle.
 
 * Imports
 
 #+begin_src python
-
 import os
 import re
+from gitignore_parser import parse_gitignore
 from typing import Optional
 from weborg.container import create_container, delete_container
-
+from weborg.utils import weborg_ignore
 #+end_src
 
+* Folder Referencing
+
+Every command works from a target folder, recursivelly. Optionally, those
+commands can specify a list of files to perform the command on, that exists in
+the target folder (recursively).
+
+#+begin_src python
+def folder_ref(folder: str) -> str:
+    return os.path.expanduser(folder)
+#+end_src
+
+* Get relative directory
+
+Let's say a detangling command has this as its taget folder:
+
+ - =/Users/foo/git/weborg/=
+
+Then, there is a file =bar.py= to detangle from the =/weborg/= sub-folder:
+
+ - =/Users/foo/git/weborg/weborg/bar.py=
+
+What we need is a function that will return the relative path:
+
+ - =weborg/=
+
+The returned path is enforced to ends with =/=. If =root= and =folder= are
+equal, then an empty string is returned.
+
+#+begin_src python
+def relative_dir(root: str, folder: str) -> str:
+    """Return the relative `dir` for a file's `root` path according to
+    `folder`. The returned relative path ends with `/`. If `root` is the same
+    as `folder`, then an empty string is returned
+
+    """
+    dir = root.removeprefix(folder)
+    if len(dir) == 0:
+        return ''
+    else:
+        return dir + '/'
+#+end_src
 
 * Tangle
 
@@ -56,41 +95,44 @@ will do the following:
   2. use =find-file= to find the file to tangle and open it in the running Emacs
      instance
   3. tangle the file with =org-babel-tangle=
+  4. once all files are tangled, it will delete the container it created to
+     perfom the tangling
 
 #+begin_src python
+def tangle(folder: str, files: Optional[list]=None):
+   """Tangle all the files of `folder` recursively. If `files` contains any
+   file, the tangling will be restricted to those listed files only."""
 
-def tangle(project_folder: str, folder: str, files: Optional[list]=None):
-    """Every time we tangle, we create a new container and attach
-    a volume to it from the provided folder, tangle and delete
-    it in case the next tangle uses a different folder.
-    If `files` has a reference to one or more files, only
-    tangle the files, in the `folder`, that are in the `files`
-    list."""
+   folder = folder_ref(folder)
 
-    print(f"project_folder: {project_folder}")
-    print(f"folder: {folder}")
-    print(f"files: {files}")
-    try:
-        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
-                                                         'mode': 'rw'}}
-        container = create_container(volume)
+   try:
+       volume = {f"{folder}": {'bind': '/mnt/org',
+                                'mode': 'rw'}}
 
-        if not files:
-            print(f"Tangling {folder}...")
-        else:
-            print(f"Tangling {files}...")
+       container = create_container(volume)
 
-        # for each org file in the folder, tangle it
-        for file in os.listdir(folder):
-            if file.endswith(".org") and (not files or file in files):
-                print("Tangling:", file)
-                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (org-babel-tangle))\"")
-                print(response.output.decode('utf-8'))
-    except Exception as e:
-        print("Tangling canceled:", str(e))
-    finally:
-        delete_container()
+       if not files:
+           print(f"Tangling {folder}...")
+       else:
+           print(f"Tangling {files}...")
 
+       # for each org file in the folder, recursively, tangle them
+       for root, dirs, dir_files in os.walk(folder):
+           for file in dir_files:
+              if file.endswith(".org") and (not files or file in files):
+                 dir = relative_dir(root, folder)
+
+                 # ignore file if it is igored by a .gitignore file
+                 if weborg_ignored(root + "/" + file, folder):
+                    continue
+
+                 print("Tangling:", file)
+                 response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{dir}{file}\\\") (org-babel-tangle))\"")
+                 print(response.output.decode('utf-8'))
+   except Exception as e:
+       print("Tangling canceled:", str(e))
+   finally:
+       delete_container()
 #+end_src
 
 * Detangle
@@ -122,8 +164,7 @@ will do the following:
      only)
 
 #+begin_src python
-
-def detangle(project_folder: str, folder: str, files: Optional[list]=None):
+def detangle(folder: str, files: Optional[list]=None):
     """Syhnchronize the source files there have been tangled back to their
     original Org code blocks. Code blocks needs to have the header 
     `:comments link` or `:comments both` to be detangled. If you use
@@ -133,13 +174,13 @@ def detangle(project_folder: str, folder: str, files: Optional[list]=None):
     If `files` has a reference to one or more files, only
     tangle the files, in the `folder`, that are in the `files` 
     list."""
-    print(f"project_folder: {project_folder}")
-    print(f"folder: {folder}")
-    print(f"files: {files}")
+
+    folder = folder_ref(folder)
 
     try:
-        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
-                                                         'mode': 'rw'}}
+        volume = {f"{folder}": {'bind': '/mnt/org',
+                                'mode': 'rw'}}
+
         container = create_container(volume)
 
         if not files:
@@ -148,27 +189,35 @@ def detangle(project_folder: str, folder: str, files: Optional[list]=None):
             print(f"Detangling {files}...")
 
         # for each source file in the folder, detangle it
-        for file in os.listdir(folder):
-            if not file.endswith(".org") and (not files or file in files):
-                # get the org file it will be detangled in. There can only
-                # be one org file per source file.
+        for root, dirs, dir_files in os.walk(folder):
+            for file in dir_files:
+                if not file.endswith(".org") and (not files or file in files):
+                    dir = relative_dir(root, folder)
 
-                org_file = []
+                    # ignore file if it is igored by a .gitignore file
+                    if weborg_ignored(root + "/" + file, folder):
+                        continue
 
-                with open(f"{folder}/{file}", "r") as tangled_file:
-                    org_file = list(set(re.findall(r"file:(.*)::",
-                                                   tangled_file.read())))[0]
+                    org_file = ""
 
-                if(len(org_file) > 0):
-                    org_file = org_file.split("/")[-1]
-                    print(f"Detangling: {file} into {org_file}")
-                    response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
-                    print(response.output.decode('utf-8'))
+                    with open(f"{dir}{file}", "r") as tangled_file:
+                        content = tangled_file.read()
+                        try:
+                            org_file = list(set(re.findall(r"file:(.*)::",content)))[-1]
+                        except Exception as e:
+                            continue
+
+                        if(len(org_file) > 0):
+                            org_file = org_file.split("/")[-1]
+                            print(f"Detangling: {file} into {org_file}")
+                            response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (org-babel-detangle \\\"/mnt/org/{dir}{file}\\\") (switch-to-buffer \\\"{org_file}\\\") (save-buffer))\"")
+                            print(response.output.decode('utf-8'))
     except Exception as e:
         print("Detangling canceled:", str(e))
     finally:
         delete_container()
 
+detangle('~/git/weborg/', ['__init__.py'])
 #+end_src
 
 * Execute
@@ -193,14 +242,16 @@ container. It will do the following:
      within the Org file.
 
 #+begin_src python
-
 def execute(project_folder: str, folder: str, files: Optional[list]=None):
     """Execute all the code blocks in the Org files in the folder.
     When you use this operation, it will execute all the code blocks
     of the file(s)."""
+
+    folder = folder_ref(folder)
+
     try:
-        volume = {f"{os.path.abspath(project_folder)}": {'bind': '/mnt/org',
-                                                         'mode': 'rw'}}
+        volume = {f"{folder}": {'bind': '/mnt/org',
+                                'mode': 'rw'}}
         container = create_container(volume)
 
         if not files:
@@ -209,16 +260,22 @@ def execute(project_folder: str, folder: str, files: Optional[list]=None):
             print(f"Execute {files}...")
 
         # for each org file in the folder, tangle it
-        for file in os.listdir(folder):
-            if file.endswith(".org") and (not files or file in files):
-                print("Execute:", file)
-                response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{folder.strip('/')}/{file}\\\") (setq org-confirm-babel-evaluate nil) (org-babel-execute-buffer))\"")
-                print(response.output.decode('utf-8'))
+        for root, dirs, dir_files in os.walk(folder):
+            for file in dir_files:
+                if file.endswith(".org") and (not files or file in files):
+                    dir = relative_dir(root, folder)
+
+                    # ignore file if it is igored by a .gitignore file
+                    if weborg_ignored(root + "/" + file, folder):
+                        continue
+
+                    print("Execute:", file)
+                    response = container.exec_run(f"emacs --load /root/.emacs.d/site-start.el --batch --eval \"(progn (find-file \\\"/mnt/org/{dir}{file}\\\") (setq org-confirm-babel-evaluate nil) (org-babel-execute-buffer))\"")
+                    print(response.output.decode('utf-8'))
     except Exception as e:
         print("Execute canceled:", str(e))
     finally:
         delete_container()
-
 #+end_src
 
 * TODO Weave
