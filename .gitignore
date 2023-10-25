@@ -2,6 +2,7 @@
 Dockerfile
 pyproject.toml
 weborg/
+resources/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
