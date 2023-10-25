@@ -1,0 +1,39 @@
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/utils.py
+
+#+Title: Utility Functions
+
+* =.weborgignore=
+
+A target folder is often full of artifact that will never contains any tangled
+files to detangle, or detangled files to tangle. We can think of virtual
+environment folders, build folders, etc.
+
+However, there are files and folders that will appear in a =.gitignore= file
+that have been tangled or detangled.
+
+For that reason, we cannot simply use =.gitignore= file to see if we try to
+tangle/detangle a file from a directory.
+
+This is why we created a new file called =.weborgignore=. This file follows the
+same specification than a =.gitignore= file, but the files will most likely
+ignore a different set of files, since their purpose is different.
+
+Every =weborg= command takes that ignore file into consideration to perform
+those actions.
+
+#+begin_src python
+def weborg_ignored(file: str, folder: str) -> bool:
+    """Check for a .weborgignore file in `folder`. Check if `file` needs to be
+    ignored accordingt to the .weborgignore file. True if it is ignored, False
+    otherwise."""
+
+    # make sure `folder` ends with a '/'
+    folder = folder.rstrip('/') + '/'
+
+    # if there is no .gitignore file, then nothing is ignored
+    if not os.path.isfile(f"{folder}.weborgignore"):
+        return False
+
+    matches = parse_gitignore(f"{folder}.weborgignore")
+    return matches(f"{folder}{file}")
+#+end_src
