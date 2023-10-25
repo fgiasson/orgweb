@@ -30,7 +30,8 @@ classifiers = [
 dependencies = [
     "typer[all]",
     "docker",
-    "watchdog"
+    "watchdog",
+    "gitignore-parser"
 ]
 
 [project.urls]
