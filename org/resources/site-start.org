@@ -88,11 +88,16 @@ is automated. The added benefit is that it won't make =monitoring= going crazy.
 
 * Configure python-mode
 
-Some configuration options to fix some warning message that could be sent by the
-mode.
+=python-mode= configurations to properly handle indentation between =tangling=
+and =detangling= of files.
+
+Note: those configurations assumes that all code processed by =weborg= uses
+spaces for indentation instead of tabs.
 
 #+begin_src elisp
-(setq python-indent-guess-indent-offset nil)
-(setq python-indent-guess-indent-offset-verbose nil)
-(setq org-edit-src-content-indentation 0)
+(custom-set-variables
+ '(indent-tabs-mode nil)
+ '(python-indent-guess-indent-offset t)
+ '(python-indent-guess-indent-offset-verbose nil)
+ '(org-edit-src-content-indentation 0))
 #+end_src
