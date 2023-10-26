@@ -46,7 +46,7 @@ import time
 import os
 from collections import deque
 from weborg.org import tangle as tangle, detangle as detangle
-from weborg.utils import weborg_ignore
+from weborg.utils import weborg_ignored
 from watchdog.events import FileSystemEventHandler
 #+end_src
 
