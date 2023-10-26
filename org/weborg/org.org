@@ -35,10 +35,9 @@ The =files= is an optional list of one or multiple files we want to tangle.
 #+begin_src python
 import os
 import re
-from gitignore_parser import parse_gitignore
 from typing import Optional
 from weborg.container import create_container, delete_container
-from weborg.utils import weborg_ignore
+from weborg.utils import weborg_ignored
 #+end_src
 
 * Folder Referencing
