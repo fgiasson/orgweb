@@ -12,7 +12,6 @@ availble to Emacs. Once it is installed, the package is required such that we
 can use it to use all other required packages.
 
 #+begin_src elisp
-
 (require 'package)
 
 (unless (package-installed-p 'use-package)
@@ -22,7 +21,6 @@ can use it to use all other required packages.
     (unless (bound-and-true-p package--initialized)
       (package-initialize))  ;; be sure load-path includes package directories
     (require 'use-package)))
-
 #+end_src
 
 * Use Packages
@@ -58,12 +56,10 @@ Configure [[https://plantuml.com][PlantUML]] such that we can create helpful dia
 execute= their code blocks to generate the images of the diagrams.
 
 #+begin_src elisp
-
 (setq plantuml-jar-path "/usr/bin/plantuml")
 (setq org-plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
 (setq org-plantuml-exec-mode 'plantuml)
-
 #+end_src
 
 * Configure Org-babel
@@ -75,14 +71,12 @@ If you don't *execute* code blocks with any new major mode you may install, you
 *do not* need to add it to that list.
 
 #+begin_src elisp
-
 (org-babel-do-load-languages
   'org-babel-load-languages
   '((emacs-lisp . t)
     (python . t)
     (dot . t)
     (plantuml . t)))
-
 #+end_src
 
 * Disable Backup Files
@@ -91,9 +85,7 @@ Disable backup files. They are not needed in this context since all the process
 is automated. The added benefit is that it won't make =monitoring= going crazy.
 
 #+begin_src elisp
-
 (setq make-backup-files nil)
-
 #+end_src
 
 * Configure python-mode
@@ -102,10 +94,6 @@ Some configuration options to fix some warning message that could be sent by the
 mode. 
 
 #+begin_src elisp
-
 (setq python-indent-guess-indent-offset t)
 (setq python-indent-guess-indent-offset-verbose nil)
-
 #+end_src
-
-
