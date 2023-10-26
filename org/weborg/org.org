@@ -48,7 +48,7 @@ the target folder (recursively).
 
 #+begin_src python
 def folder_ref(folder: str) -> str:
-    return os.path.expanduser(folder)
+    return os.path.abspath(os.path.expanduser(folder))
 #+end_src
 
 * Get relative directory
