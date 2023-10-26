@@ -216,8 +216,6 @@ def detangle(folder: str, files: Optional[list]=None):
         print("Detangling canceled:", str(e))
     finally:
         delete_container()
-
-detangle('~/git/weborg/', ['__init__.py'])
 #+end_src
 
 * Execute
