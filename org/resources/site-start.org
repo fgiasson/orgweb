@@ -39,15 +39,13 @@ doesn't know how to handle comments for that language, and won't tangle the Org
 file where the code block that uses this language is located.
 
 #+begin_src elisp
-
 (use-package org)
 (use-package dockerfile-mode)
 (use-package yaml-mode)
 (use-package terraform-mode)
 (use-package graphviz-dot-mode)
 (use-package plantuml-mode)
-(use-package topml-mode)
-
+(use-package toml-mode)
 #+end_src
 
 * Configure PlantUML
