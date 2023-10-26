@@ -11,10 +11,8 @@ containers, delete containers, etc.
 We use thew [[https://github.com/docker/docker-py][python-py]] project.
 
 #+begin_src python
-
 import docker
 from docker.errors import ImageNotFound, NotFound
-
 #+end_src
 
 * Initialize Docker
@@ -22,9 +20,7 @@ from docker.errors import ImageNotFound, NotFound
 Initialize the docker object from the computer's environment.
 
 #+begin_src python
-
 docker = docker.from_env()
-
 #+end_src
 
 * Images Utility Functions
@@ -37,7 +33,6 @@ Docker, and then the next time he will run =weborg=, then it will be recreated
 automatically using this function.
 
 #+begin_src python
-
 def build_image(img: str='localbuild:weborg') -> None:
     """Build the weborg image from the Dockerfile. Returns <image, logs>"""
     image, logs = docker.images.build(path='.', tag=img, rm=True)
@@ -51,7 +46,6 @@ def image_exists(img: str='localbuild:weborg') -> bool:
         return True
     except ImageNotFound:
         return False
-
 #+end_src
 
 * Containers Utility Functions
@@ -61,7 +55,6 @@ Series of utility functions to create and manage Docker containers. Every time a
 and then the container is deleted.
 
 #+begin_src python
-
 def create_container(volume: dict, container: str='weborg', img:
                      str='localbuild:weborg') -> None:
     """Create the weborg container from the weborg image"""
@@ -93,5 +86,4 @@ def container_running(container: str='weborg') -> bool:
 def delete_container(container: str='weborg') -> None:
     """Delete the weborg container from the Docker environment"""
     docker.containers.get(container).remove(force=True)
-
 #+end_src

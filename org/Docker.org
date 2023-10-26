@@ -15,9 +15,7 @@ minimize the size of the container and to increase its execution speed as much
 as possible.
 
 #+BEGIN_SRC dockerfile
-
 FROM alpine:3.18.4
-
 #+END_SRC
 
 The next step is to install Bash and Emacs with fixed versions. Then we create
@@ -29,7 +27,6 @@ that we use to install and run different Org-mode commands.
  - =plantuml= is required to generate UML diagrams
 
 #+BEGIN_SRC dockerfile
-
 RUN apk add --no-cache bash=5.2.15-r5 && \
     apk add --no-cache emacs=28.2-r8 && \
     apk add --no-cache graphviz=8.0.5-r1 && \
@@ -37,7 +34,6 @@ RUN apk add --no-cache bash=5.2.15-r5 && \
     apk add --no-cache git=2.40.1-r0 && \
     apk add --no-cache plantuml=1.2023.6-r0 && \
     mkdir ~/.emacs.d
-
 #+END_SRC
 
 Next step is to define the working directory of the container: =/root/.emacs./=.
@@ -52,24 +48,20 @@ Then we copy two files to that directory:
    from the command line.
 
 #+BEGIN_SRC dockerfile
-
 # Set the working directory within the container
 WORKDIR /root/.emacs.d
 
 # Copy necessary files to the container
 COPY resources/install.el .
 COPY resources/site-start.el .
-
 #+END_SRC
 
 The last step is to install all the required packages to run =weborg=. This is
 done by running Emacs in batch mode and by loading the =install.el= script.
 
 #+BEGIN_SRC dockerfile
-
 # Set the working directory within the container
 RUN emacs --load /root/.emacs.d/install.el --batch
-
 #+END_SRC
 
 When the next version of Alpine will be released, we should tangle this code
