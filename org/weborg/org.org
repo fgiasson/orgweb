@@ -75,7 +75,7 @@ def relative_dir(root: str, folder: str) -> str:
     as `folder`, then an empty string is returned
 
     """
-    dir = root.removeprefix(folder)
+    dir = root.removeprefix(folder).strip('/')
     if len(dir) == 0:
         return ''
     else:
