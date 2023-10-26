@@ -13,11 +13,14 @@ Many major modes are only available on MELPA and not in ELPA, we we have to add
 it to the vanilla Emacs instance.
 
 #+begin_src elisp
-(require 'package) 
+(require 'package)
 
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")))
 
-(package-initialize) 
+(package-initialize)
 (package-refresh-contents)
 #+end_src
 
@@ -30,6 +33,7 @@ environment. Finally, the next time you rerun =weborg= then the new Docker image
 will be created and the new mode will be available to Org mode.
 
 #+begin_src elisp
+(package-install 'org)
 (package-install 'use-package)
 (package-install 'yaml-mode)
 (package-install 'dockerfile-mode)
