@@ -2,6 +2,13 @@
 
 #+Title: Utility Functions
 
+* Imports
+
+#+begin_src python
+import os
+from gitignore_parser import parse_gitignore
+#+end_src
+
 * =.weborgignore=
 
 A target folder is often full of artifact that will never contains any tangled
