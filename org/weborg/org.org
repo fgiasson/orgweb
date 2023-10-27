@@ -189,6 +189,11 @@ def detangle(folder: str, files: Optional[list]=None):
 
         # for each source file in the folder, detangle it
         for root, dirs, dir_files in os.walk(folder):
+
+            # ignore folder if it is igored by a .gitignore file
+            if weborg_ignored(root, folder):
+                continue
+
             for file in dir_files:
                 if not file.endswith(".org") and (not files or file in files):
                     dir = relative_dir(root, folder)
