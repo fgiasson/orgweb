@@ -244,7 +244,7 @@ container. It will do the following:
      within the Org file.
 
 #+begin_src python
-def execute(project_folder: str, folder: str, files: Optional[list]=None):
+def execute(folder: str, files: Optional[list]=None):
     """Execute all the code blocks in the Org files in the folder.
     When you use this operation, it will execute all the code blocks
     of the file(s)."""
