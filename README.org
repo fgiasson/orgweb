@@ -107,9 +107,7 @@ Once the repository is cloned, let's tangle all the files:
 
 #+begin_src shell :eval no
 cd weborg
-weborg tangle . org/
-weborg tangle . org/resources/
-weborg tangle . org/weborg/
+weborg tangle .
 #+end_src
 
 These commands will tangle all the sources and configuration files required by
@@ -135,11 +133,8 @@ test some changes you made to the application.
 
 Each of the operation work with the same folder structure assumption. There are three main components:
 
-  1. project folder
-  2. folder
-  3. files
-
-The =project folder= is the root of the project currently being worked on.
+  1. folder
+  2. files
 
 The =folder= is a where the =files= are located, within the =project folder=.
 
@@ -147,10 +142,9 @@ The =files= is a list of one or multiple files we want to tangle.
 
 ** Tangle
 
-=weborg tangle= takes a =project_folder= and a =folder= as input. The =folder=
-is where the Org files we want to tangle are located. If we want to tangle all
-the Org files from the =project_folder=, then the =folder= will have the same
-path as the =project_folder=.
+=weborg tangle= takes a =folder= as input. The =folder= is where the Org files
+we want to tangle are located. The operation is recursive, it will check in all
+subfolders of =folder=
 
 Optionally, one or multiple files can be listed. Those files are located in
 =folder=, and those are the ones that will be tangled from that folder.
@@ -160,7 +154,7 @@ If no file is mentioned, then all the Org files from =folder= will be tangled.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg tangle . foo/ --file=foo.org --file=bar.org
+weborg tangle . --file=foo.org --file=bar.org
 
 #+end_src
 
@@ -169,10 +163,9 @@ and =/my/project/folder/bar.org=
 
 ** Detangle
 
-=weborg detangle= takes a =project_folder= and a =folder= as input. The =folder=
-is where the source files we want to detangle are located. If we want to
-detangle all the source files from the =project_folder=, then the =folder= will
-have the same path as the =project_folder=.
+=weborg detangle= takes a =folder= as input. The =folder= is where the source
+files we want to detangle are located. The operation is recursive, it will check in all
+subfolders of =folder=
 
 Optionally, one or multiple files can be listed. Those files are located in
 =folder=, and those are the ones that will be detangled from that folder.
@@ -186,7 +179,7 @@ the tangling markup in comments of the source file.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg detangle . foo/ --file=foo.py --file=bar.py
+weborg detangle . --file=foo.py --file=bar.py
 
 #+end_src
 
@@ -195,10 +188,9 @@ In that example, =weborg= will detangle the two files
 
 ** Execute
 
-=weborg execute= takes a =project_folder= and a =folder= as input. The =folder=
-is where the Org files we want to execute are located. If we want to execute all
-the source files from the =project_folder=, then the =folder= will have the same
-path as the =project_folder=.
+=weborg execute= takes a =folder= as input. The =folder= is where the Org files
+we want to execute are located. The operation is recursive, it will check in all
+subfolders of =folder=
 
 Optionally, one or multiple files can be listed. Those files are located in
 =folder=, and those are the ones that will be executed from that folder.
@@ -212,7 +204,7 @@ that are referrenced within Org files.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg execute . foo/ --file=foo.org
+weborg execute . --file=foo.org
 
 #+end_src
 
