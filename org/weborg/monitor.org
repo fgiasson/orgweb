@@ -130,12 +130,10 @@ class OrgFileChangeHandler(FileSystemEventHandler):
                 if folder == '/': folder = '.'
                 if event.src_path.endswith(".org"):
                     print('File changed, tangling:', event.src_path)
-                    tangle(self.path, folder,
-                           [os.path.basename(event.src_path)])
+                    tangle(folder, [os.path.basename(event.src_path)])
                 else:
                     print('File changed, detangling:', event.src_path)
-                    detangle(self.path, folder,
-                             [os.path.basename(event.src_path)])
+                    detangle(folder, [os.path.basename(event.src_path)])
             else:
                 print('File changed, but ignored:', event.src_path)
 #+end_src
