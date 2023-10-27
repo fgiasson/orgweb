@@ -22,7 +22,7 @@ virtual environment is deleted and recreated.
 
 #+begin_src makefile
 install-build:
-        pip install --upgrade build
+    pip install --upgrade build
 #+end_src
 
 * create-env
@@ -32,7 +32,7 @@ development of =weborg= will occur.
 
 #+begin_src makefile
 create-venv:
-        python3 -m venv .venv
+    python3 -m venv .venv
 #+end_src
 
 * build
@@ -42,7 +42,7 @@ is created and sourced.
 
 #+begin_src makefile
 build:
-        python3 -m build
+    python3 -m build
 #+end_src
 
 * install-local-build
@@ -52,7 +52,7 @@ build:
 
 #+begin_src makefile
 install-local-build:
-        pip install .
+    pip install .
 #+end_src
 
 * uninstall-local-build
@@ -61,7 +61,7 @@ environment.
 
 #+begin_src makefile
 uninstall-local-build:
-        pip uninstall -y weborg
+    pip uninstall -y weborg
 #+end_src
 
 * rebuild-local
@@ -71,9 +71,9 @@ uninstall-local-build:
 
 #+begin_src makefile
 rebuild-local:
-        pip uninstall -y weborg
-        python3 -m build
-        pip install .
+    pip uninstall -y weborg
+    python3 -m build
+    pip install .
 #+end_src
 
 * Clean
@@ -83,13 +83,13 @@ artifacts.
 
 #+begin_src makefile
 clean:
-        rm -rf build
-        rm -rf dist
-        rm -rf weborg.egg-info
-        rm -rf org/weborg/__pycache__
-        rm -rf weborg
-        rm -rf resources
-        rm -rf .mypy_cache
-        rm Dockerfile
-        rm pyproject.toml
+		rm -rf build
+		rm -rf dist
+		rm -rf weborg.egg-info
+		rm -rf org/weborg/__pycache__
+		rm -rf weborg
+		rm -rf resources
+		rm -rf .mypy_cache
+		rm Dockerfile
+		rm pyproject.toml
 #+end_src
