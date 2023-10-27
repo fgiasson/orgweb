@@ -3,6 +3,7 @@ Dockerfile
 pyproject.toml
 /orgweb/
 resources/
+pypi-readme.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

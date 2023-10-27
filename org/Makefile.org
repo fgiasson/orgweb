@@ -93,3 +93,14 @@ clean:
 	rm Dockerfile
 	rm pyproject.toml
 #+end_src
+
+* Create PyPi Readme file
+
+Since PyPi doesn't support Org readme, we have to export it in Markdown to have
+it available on the PyPi package page.
+
+#+begin_src makefile
+export-pypi-readme:
+	emacs --batch --eval "(progn (find-file \"README.org\") (org-md-export-to-markdown))"
+	mv README.md pypi-readme.md
+#+end_src

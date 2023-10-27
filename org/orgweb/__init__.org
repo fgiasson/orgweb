@@ -5,5 +5,5 @@
 Define the current version of the =orgweb= command line tool.
 
 #+begin_src python
-__version__ = "0.0.2"
+__version__ = "0.0.4"
 #+end_src
