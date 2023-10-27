@@ -1,8 +1,8 @@
-#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/org.py
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/org.py
 
 #+Title: Org Commands
 
-The =weborg= command line utility is used Docker to create a Alpine Linux image
+The =orgweb= command line utility is used Docker to create a Alpine Linux image
 with Emacs properly configured to be able to run different Org commands on a
 programming project folder.
 
@@ -36,8 +36,8 @@ The =files= is an optional list of one or multiple files we want to tangle.
 import os
 import re
 from typing import Optional
-from weborg.container import create_container, delete_container
-from weborg.utils import weborg_ignored
+from orgweb.container import create_container, delete_container
+from orgweb.utils import orgweb_ignored
 #+end_src
 
 * Folder Referencing
@@ -55,15 +55,15 @@ def folder_ref(folder: str) -> str:
 
 Let's say a detangling command has this as its taget folder:
 
- - =/Users/foo/git/weborg/=
+ - =/Users/foo/git/orgweb/=
 
-Then, there is a file =bar.py= to detangle from the =/weborg/= sub-folder:
+Then, there is a file =bar.py= to detangle from the =/orgweb/= sub-folder:
 
- - =/Users/foo/git/weborg/weborg/bar.py=
+ - =/Users/foo/git/orgweb/orgweb/bar.py=
 
 What we need is a function that will return the relative path:
 
- - =weborg/=
+ - =orgweb/=
 
 The returned path is enforced to ends with =/=. If =root= and =folder= are
 equal, then an empty string is returned.
@@ -122,7 +122,7 @@ def tangle(folder: str, files: Optional[list]=None):
                  dir = relative_dir(root, folder)
 
                  # ignore file if it is igored by a .gitignore file
-                 if weborg_ignored(root + "/" + file, folder):
+                 if orgweb_ignored(root + "/" + file, folder):
                     continue
 
                  print("Tangling:", file)
@@ -191,7 +191,7 @@ def detangle(folder: str, files: Optional[list]=None):
         for root, dirs, dir_files in os.walk(folder):
 
             # ignore folder if it is igored by a .gitignore file
-            if weborg_ignored(root, folder):
+            if orgweb_ignored(root, folder):
                 continue
 
             for file in dir_files:
@@ -199,7 +199,7 @@ def detangle(folder: str, files: Optional[list]=None):
                     dir = relative_dir(root, folder)
 
                     # ignore file if it is igored by a .gitignore file
-                    if weborg_ignored(root + "/" + file, folder):
+                    if orgweb_ignored(root + "/" + file, folder):
                         continue
 
                     org_file = ""
@@ -268,7 +268,7 @@ def execute(folder: str, files: Optional[list]=None):
                     dir = relative_dir(root, folder)
 
                     # ignore file if it is igored by a .gitignore file
-                    if weborg_ignored(root + "/" + file, folder):
+                    if orgweb_ignored(root + "/" + file, folder):
                         continue
 
                     print("Execute:", file)

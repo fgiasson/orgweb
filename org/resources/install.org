@@ -29,7 +29,7 @@ it to the vanilla Emacs instance.
 If you need new package to handle non-default major modes for your Org file,
 this is where you add them. Once you added them, you will have to =make
 rebuild-local= and to delete the previous Docker image in your Docker
-environment. Finally, the next time you rerun =weborg= then the new Docker image
+environment. Finally, the next time you rerun =orgweb= then the new Docker image
 will be created and the new mode will be available to Org mode.
 
 #+begin_src elisp

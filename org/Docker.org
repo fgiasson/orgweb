@@ -3,7 +3,7 @@
 #+TITLE: Dockerfile
 
 This =Dockerfile= is used to build an image that has Emacs installed and
-configured Org-mode. This is the core of =weborg= since all the Org-mode
+configured Org-mode. This is the core of =orgweb= since all the Org-mode
 operations are performed using that image by spawning containers for each
 command.
 
@@ -42,7 +42,7 @@ This is where Emacs will look for different startup and configuration scripts.
 Then we copy two files to that directory:
 
  - install.el: this is the script that will install all required packages to run
-   =weborg=
+   =orgweb=
  - site-start.el: this is the script that is used by the different Org commands
    such as =tangle= and =detangle= to configure the emacs session that is ran
    from the command line.
@@ -56,7 +56,7 @@ COPY resources/install.el .
 COPY resources/site-start.el .
 #+END_SRC
 
-The last step is to install all the required packages to run =weborg=. This is
+The last step is to install all the required packages to run =orgweb=. This is
 done by running Emacs in batch mode and by loading the =install.el= script.
 
 #+BEGIN_SRC dockerfile

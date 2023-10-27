@@ -1,14 +1,14 @@
-#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/monitor.py
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/monitor.py
 
 #+Title: File Changes Monitoring
 
 To understand the importance of the files monitoring concept in the context of
-=weborg=, we have to keep in mind the development workflow.
+=orgweb=, we have to keep in mind the development workflow.
 
-=weborg= is primary intended for developers that want to use Literate
+=orgweb= is primary intended for developers that want to use Literate
 Programming using Org-mode to develop their project without having to use Emacs.
 If the developer is already familiar with Emacs, or is willing to learn how to
-use it then =weborg= is not necessary since everything can happen automatically
+use it then =orgweb= is not necessary since everything can happen automatically
 by properly configuring Emacs.
 
 However, this is the exception, and not the norm. In a context where a developer
@@ -16,24 +16,24 @@ is using any other IDE, then monitoring file changes is essential. Every time a
 Org file, or a tangled source file, is modified, we have to run a =tangle= or
 =detangle= command to keep the Org files and their sources files synchronized.
 
-To use the monitoring capabilities of =weborg=, the developer will run it in a
+To use the monitoring capabilities of =orgweb=, the developer will run it in a
 shell instance for as long as he work on the files. To start the monitoring, he
 will:
 
 #+begin_src shell :tangle no
 cd /my/project/folder/
-weborg monitor .
+orgweb monitor .
 #+end_src
 
 The user will move to the folder where his project is located and will tell
-=weborg= to monitor that folder and all sub-folders recursivelly.
+=orgweb= to monitor that folder and all sub-folders recursivelly.
 
 If a file is changed, then the command will detect it and will output the
 operation is is performing in reaction to the file's change:
 
 #+begin_quote
-➜ weborg monitor .
-File changed, tangling: /Users/frederickgiasson/git/weborg/org/weborg/monitor.org
+➜ orgweb monitor .
+File changed, tangling: /Users/frederickgiasson/git/orgweb/org/orgweb/monitor.org
 Tangling ['monitor.org']...
 Tangling: monitor.org
 Tangled 3 code blocks from monitor.org
@@ -45,8 +45,8 @@ Tangled 3 code blocks from monitor.org
 import time
 import os
 from collections import deque
-from weborg.org import tangle as tangle, detangle as detangle
-from weborg.utils import weborg_ignored
+from orgweb.org import tangle as tangle, detangle as detangle
+from orgweb.utils import orgweb_ignored
 from watchdog.events import FileSystemEventHandler
 #+end_src
 

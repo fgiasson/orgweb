@@ -2,7 +2,7 @@
 
 #+TITLE: Emacs Site Start Init Script
 
-The =site-start.el= script is used by =weborg= to configure the Emacs instance
+The =site-start.el= script is used by =orgweb= to configure the Emacs instance
 that is started from the command line.
 
 * use-package
@@ -26,13 +26,13 @@ can use it to use all other required packages.
 * Use Packages
 
 Series of package that are enabled. Those are the default ones shipped with
-=weborg=. If you are using a new language that is not currently supported by any
+=orgweb=. If you are using a new language that is not currently supported by any
 of the major mode listed below, yhou will have to:
 
   1. install it in =install.org=
   2. use it below
   3. delete the Docker image in the current environment
-  4. run =weborg= to have it recreating the image with the new supported mode
+  4. run =orgweb= to have it recreating the image with the new supported mode
 
 If you don't add the new major mode in Emacs, Org-mode will complain that it
 doesn't know how to handle comments for that language, and won't tangle the Org
@@ -50,7 +50,7 @@ file where the code block that uses this language is located.
 
 * Configure PlantUML
 
-Configure [[https://plantuml.com][PlantUML]] such that we can create helpful diagram and to =weborg
+Configure [[https://plantuml.com][PlantUML]] such that we can create helpful diagram and to =orgweb
 execute= their code blocks to generate the images of the diagrams.
 
 #+begin_src elisp
@@ -91,7 +91,7 @@ is automated. The added benefit is that it won't make =monitoring= going crazy.
 =python-mode= configurations to properly handle indentation between =tangling=
 and =detangling= of files.
 
-Note: those configurations assumes that all code processed by =weborg= uses
+Note: those configurations assumes that all code processed by =orgweb= uses
 spaces for indentation instead of tabs.
 
 #+begin_src elisp

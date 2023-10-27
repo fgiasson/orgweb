@@ -1,8 +1,8 @@
-#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/main.py
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/main.py
 
 #+Title: Main
 
-=weborg= is a command line utility that is used to use Org-mode as a Literate
+=orgweb= is a command line utility that is used to use Org-mode as a Literate
 Programming framework when using another IDE than Emacs.
 
 It is used to:
@@ -13,7 +13,7 @@ It is used to:
   - Monitor file changes on the file system to automatically tangle or detangle
     files
 
-For a complete description of the Literate workflow using =weborg=, please read
+For a complete description of the Literate workflow using =orgweb=, please read
 the README.org file.
 
 * Imports
@@ -46,31 +46,31 @@ app = typer.Typer()
 
 * Version Command
 
-Gives the version of the currently installed =weborg= in the environment.
+Gives the version of the currently installed =orgweb= in the environment.
 =__version__= is simply imported from the module's =__init__.py= file.
 
 #+begin_src python
 @app.command()
 def version():
-    """Get the current installed version of weborg"""
+    """Get the current installed version of orgweb"""
     print(f"Version: {__version__}")
 #+end_src
 
 * Config Command
 
 Gives the list of environment variables configurations available to configure
-=weborg= and their current values.
+=orgweb= and their current values.
 
 #+begin_src python
 @app.command()
 def config():
-    """Get the current configuration of weborg"""
+    """Get the current configuration of orgweb"""
     # print(f"DOCS_PATH: {os.environ.get('DOCS_PATH')}")
 #+end_src
 
 * Tangle Command
 
-=weborg tangle= takes a =folder= as input. The =folder= is where the Org files
+=orgweb tangle= takes a =folder= as input. The =folder= is where the Org files
 we want to tangle are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -81,10 +81,10 @@ If no file is mentioned, then all the Org files from =folder= will be tangled.
 
 #+begin_src shell :tangle no
 cd /my/project/folder/
-weborg tangle foo/ --file=foo.org --file=bar.org
+orgweb tangle foo/ --file=foo.org --file=bar.org
 #+end_src
 
-In that example, =weborg= will tangle the two files =/my/project/folder/foo.org=
+In that example, =orgweb= will tangle the two files =/my/project/folder/foo.org=
 and =/my/project/folder/bar.org=
 
 #+begin_src python
@@ -98,7 +98,7 @@ def tangle(folder: str = typer.Argument(..., help="Folder where the Org-mode fil
 
 * Detangle Command
 
-=weborg detangle= takes a =folder= as input. The =folder= is where the source
+=orgweb detangle= takes a =folder= as input. The =folder= is where the source
 files we want to detangle are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -113,10 +113,10 @@ the tangling markup in comments of the source file.
 
 #+begin_src shell :tangle no
 cd /my/project/folder/
-weborg detangle foo/ --file=foo.py --file=bar.py
+orgweb detangle foo/ --file=foo.py --file=bar.py
 #+end_src
 
-In that example, =weborg= will detangle the two files
+In that example, =orgweb= will detangle the two files
 =/my/project/folder/foo.py= and =/my/project/folder/bar.py=
 
 #+begin_src python
@@ -131,7 +131,7 @@ def detangle(folder: str = typer.Argument(..., help="Folder where the source fil
 
 * Execute Command
 
-=weborg execute= takes a =folder= as input. The =folder= is where the Org files
+=orgweb execute= takes a =folder= as input. The =folder= is where the Org files
 we want to execute are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -146,10 +146,10 @@ that are referrenced within Org files.
 
 #+begin_src shell :tangle no
 cd /my/project/folder/
-weborg execute foo/ --file=foo.org
+orgweb execute foo/ --file=foo.org
 #+end_src
 
-In that example, =weborg= will execute the =/my/project/folder/foo.py=
+In that example, =orgweb= will execute the =/my/project/folder/foo.py=
 
 #+begin_src python
 @app.command()
@@ -163,7 +163,7 @@ def execute(folder: str = typer.Argument(..., help="Folder where the Org-mode fi
 
 * Monitor Command
 
-=weborg monitor= will take a folder as input and will monitor every file changes
+=orgweb monitor= will take a folder as input and will monitor every file changes
 in that directory, recursively. If a Org file changes, it will be tangled, if a
 source file changes it will be detangled.
 
@@ -190,19 +190,19 @@ def monitor(folder: str = typer.Argument(..., help="The folder to monitor for ch
 
 * Initialize
 
-When =weborg= is ran, the first thing is checked is if the Docker image
+When =orgweb= is ran, the first thing is checked is if the Docker image
 currently exists in the environment. If it doesn't, then the image will be
 created and then the command executed in a container of that image.
 
 If a developer changes something in the =Dockerfile= or any other files that
 affect the image, he simply has to delete the outdated image from the
-environment and rerun any =weborg= command to recreate the image from scratch.
+environment and rerun any =orgweb= command to recreate the image from scratch.
 
 ** TODO detect if Docker is running, otherwise return a clean error.
 
 #+begin_src python
 def init():
-    """Initialize weborg"""
+    """Initialize orgweb"""
 
     # Make sure the Docker image exists on the local system
     if not image_exists():

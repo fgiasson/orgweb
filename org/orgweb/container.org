@@ -1,8 +1,8 @@
-#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../weborg/container.py
+#+property: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/container.py
 
 #+Title: Docker Containers Management
 
-The =weborg= command line application is fully autonomous. As soon as Docker is
+The =orgweb= command line application is fully autonomous. As soon as Docker is
 installed locally, it can build images using the =Dockerfile=, create new
 containers, delete containers, etc.
 
@@ -29,18 +29,18 @@ Utility functions build images and check if a given image exists in the current
 Docker environment.
 
 If the user wants to recreate the image, he simply has to delete it using
-Docker, and then the next time he will run =weborg=, then it will be recreated
+Docker, and then the next time he will run =orgweb=, then it will be recreated
 automatically using this function.
 
 #+begin_src python
-def build_image(img: str='localbuild:weborg') -> None:
-    """Build the weborg image from the Dockerfile. Returns <image, logs>"""
+def build_image(img: str='localbuild:orgweb') -> None:
+    """Build the orgweb image from the Dockerfile. Returns <image, logs>"""
     image, logs = docker.images.build(path='.', tag=img, rm=True)
     return image, logs
 
 
-def image_exists(img: str='localbuild:weborg') -> bool:
-    """Check if the weborg image exists in the Docker environment"""
+def image_exists(img: str='localbuild:orgweb') -> bool:
+    """Check if the orgweb image exists in the Docker environment"""
     try:
         docker.images.get(img)
         return True
@@ -51,13 +51,13 @@ def image_exists(img: str='localbuild:weborg') -> bool:
 * Containers Utility Functions
 
 Series of utility functions to create and manage Docker containers. Every time a
-=weborg= command is executed, a container is created, the operation is executed,
+=orgweb= command is executed, a container is created, the operation is executed,
 and then the container is deleted.
 
 #+begin_src python
-def create_container(volume: dict, container: str='weborg', img:
-                     str='localbuild:weborg') -> None:
-    """Create the weborg container from the weborg image"""
+def create_container(volume: dict, container: str='orgweb', img:
+                     str='localbuild:orgweb') -> None:
+    """Create the orgweb container from the orgweb image"""
     return docker.containers.run(img,
                                  detach=True,
                                  tty=True,
@@ -65,16 +65,16 @@ def create_container(volume: dict, container: str='weborg', img:
                                  name=container,
                                  volumes=volume)
 
-def container_exists(container: str='weborg') -> bool:
-    """Check if the weborg container exists in the Docker environment"""
+def container_exists(container: str='orgweb') -> bool:
+    """Check if the orgweb container exists in the Docker environment"""
     try:
         docker.containers.get(container)
         return True
     except NotFound:
         return False
 
-def container_running(container: str='weborg') -> bool:
-    """Check if the weborg container is running in the Docker environment"""
+def container_running(container: str='orgweb') -> bool:
+    """Check if the orgweb container is running in the Docker environment"""
     try:
         if docker.containers.get(container).status == 'running':
             return True
@@ -83,7 +83,7 @@ def container_running(container: str='weborg') -> bool:
     except NotFound:
         return False
 
-def delete_container(container: str='weborg') -> None:
-    """Delete the weborg container from the Docker environment"""
+def delete_container(container: str='orgweb') -> None:
+    """Delete the orgweb container from the Docker environment"""
     docker.containers.get(container).remove(force=True)
 #+end_src

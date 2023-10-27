@@ -3,7 +3,7 @@
 #+TITLE: Makefile
 
 The Make file is used to encapsulate a few commands that are useful while
-developing =weborg=
+developing =orgweb=
 
 * Phony
 
@@ -28,7 +28,7 @@ install-build:
 * create-env
 
 =make create-env= is used to create a new Python environment where the
-development of =weborg= will occur.
+development of =orgweb= will occur.
 
 #+begin_src makefile
 create-venv:
@@ -37,7 +37,7 @@ create-venv:
 
 * build
 
-=make build= is used to build the =weborg= package once the virtual environment
+=make build= is used to build the =orgweb= package once the virtual environment
 is created and sourced.
 
 #+begin_src makefile
@@ -48,7 +48,7 @@ build:
 * install-local-build
 
 =make install-local-build= is used after running =make build= to install
-=weborg= in the current environment.
+=orgweb= in the current environment.
 
 #+begin_src makefile
 install-local-build:
@@ -56,12 +56,12 @@ install-local-build:
 #+end_src
 
 * uninstall-local-build
-=make uninstall-local-build= is used to uninstall =weborg= from the current
+=make uninstall-local-build= is used to uninstall =orgweb= from the current
 environment.
 
 #+begin_src makefile
 uninstall-local-build:
-	pip uninstall -y weborg
+	pip uninstall -y orgweb
 #+end_src
 
 * rebuild-local
@@ -71,7 +71,7 @@ uninstall-local-build:
 
 #+begin_src makefile
 rebuild-local:
-	pip uninstall -y weborg
+	pip uninstall -y orgweb
 	python3 -m build
 	pip install .
 #+end_src
@@ -85,9 +85,9 @@ artifacts.
 clean:
 	rm -rf build
 	rm -rf dist
-	rm -rf weborg.egg-info
-	rm -rf org/weborg/__pycache__
-	rm -rf weborg
+	rm -rf orgweb.egg-info
+	rm -rf org/orgweb/__pycache__
+	rm -rf orgweb
 	rm -rf resources
 	rm -rf .mypy_cache
 	rm Dockerfile

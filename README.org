@@ -1,14 +1,14 @@
 #+PROPERTY: header-args :eval yes
 
-#+title: WebOrg: CLI Org-Mode Environment for WEB like development without Emacs
+#+title: OrgWeb: CLI Org-Mode Environment for WEB like development without Emacs
 
-=weborg= is intended for developers that want to create literate programming
+=orgweb= is intended for developers that want to create literate programming
 project using Org-mode, but that *does not* want to investing time to learn how
 to use Emacs and Org-mode. If you are a developer that already uses Emacs and
 Org-mode, this tool is most likely not for you, but maybe for the people on your
 team that doesn't know, nor want to know, about Emacs.
 
-=weborg= is a very simple CLI tool that does the following:
+=orgweb= is a very simple CLI tool that does the following:
 
   1. =tangle= one or multiple Org files
   2. =detangle= one or multiple source files
@@ -23,53 +23,53 @@ this repository to have a glimps of the potential.
 
 * How does it work?
 
-=weborg= is designed in a way that developers can use all the power of Org-mode,
+=orgweb= is designed in a way that developers can use all the power of Org-mode,
 in any IDE they like, without having to rely on Emacs directly.
 
 To do that, it leverages Docker to build an image where Emacs is properly
 installed and configured to implement the commands that are exposed via the
 command line tool.
 
-If the =weborg= docker image is not currently existing in the environment, then
+If the =orgweb= docker image is not currently existing in the environment, then
 it will request Docker to build the image using the Dockerfile. The build
 process will install and configure all the components required to implement all
-=weborg= commands.
+=orgweb= commands.
 
-=weborg= check if it exists every time it is invoked from the command line. This
+=orgweb= check if it exists every time it is invoked from the command line. This
 process will happen any time that the image is not available in the environment.
 
-#+BEGIN_SRC plantuml :file imgs/weborg_flow.svg :exports results
+#+BEGIN_SRC plantuml :file imgs/orgweb.svg :exports results
 
-WebOrg -> Docker: Command
+OrgWeb -> Docker: Command
 Docker -> Image: Build Image
 Image -> Emacs: Install & Configure
 
 #+END_SRC
 
 #+RESULTS:
-[[file:imgs/weborg_flow.svg]]
+[[file:imgs/orgweb.svg]]
 
 If the image is existing in the environment, then the following will happen.
 
-=weborg= will ask Docker to create a container based on the image. Once the
+=orgweb= will ask Docker to create a container based on the image. Once the
 container is running, it will execute a command on the container's terminal to
 run Emacs. Emacs is used directly from the command line by evaluating ELisp code
 it gets as input.
 
-Every time a =weborg= command line is executed, a new container is created:
+Every time a =orgweb= command line is executed, a new container is created:
 
 
-#+BEGIN_SRC plantuml :file imgs/weborg_flow_2.svg :exports results
+#+BEGIN_SRC plantuml :file imgs/orgweb_2.svg :exports results
 
-WebOrg -> Docker: Run Container
+OrgWeb -> Docker: Run Container
 Docker -> Container: Create Container
 Image <-- Container: Uses
-WebOrg -> Emacs: Execute Command
+OrgWeb -> Emacs: Execute Command
 
 #+END_SRC
 
 #+RESULTS:
-[[file:imgs/weborg_flow_2.svg]]
+[[file:imgs/orgweb_2.svg]]
 
 
 * Installing
@@ -82,32 +82,32 @@ this step. Otherwise, you should install Docker.
 
 ** From Package
 
-=weborg= is available on PyPi, you can easily install it locally by running the
+=orgweb= is available on PyPi, you can easily install it locally by running the
 following command in your terminal:
 
 #+begin_src shell :eval no
-pip install weborg
+pip install orgweb
 #+end_src
 
 ** From Source
 
 If you want to improve and contribute to the project, you will first have to
 generate the sources files from the Org mode files in the repository. To do so,
-you will need =weborg= itself (installed in the previous step), or you could do
+you will need =orgweb= itself (installed in the previous step), or you could do
 the same if you have a local Emacs instance configured with =org-mode=. But
 let's assumes you don't.
 
 First clone the repository in your environment:
 
 #+begin_src shell :eval no
-git clone https://github.com/fgiasson/weborg.git
+git clone https://github.com/fgiasson/orgweb.git
 #+end_src
 
 Once the repository is cloned, let's tangle all the files:
 
 #+begin_src shell :eval no
-cd weborg
-weborg tangle .
+cd orgweb
+orgweb tangle .
 #+end_src
 
 These commands will tangle all the sources and configuration files required by
@@ -120,7 +120,7 @@ development environment and the package to run locally.
 make create-venv          # create the pyenv virtual environment
 make install-build        # install Python's build
 source .venv/bin/activate # source that environment
-make build                # build the weborg CLI application
+make build                # build the orgweb CLI application
 make install-local-build  # install the package we just created
 #+end_src
 
@@ -142,7 +142,7 @@ The =files= is a list of one or multiple files we want to tangle.
 
 ** Tangle
 
-=weborg tangle= takes a =folder= as input. The =folder= is where the Org files
+=orgweb tangle= takes a =folder= as input. The =folder= is where the Org files
 we want to tangle are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -154,16 +154,16 @@ If no file is mentioned, then all the Org files from =folder= will be tangled.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg tangle . --file=foo.org --file=bar.org
+orgweb tangle . --file=foo.org --file=bar.org
 
 #+end_src
 
-In that example, =weborg= will tangle the two files =/my/project/folder/foo.org=
+In that example, =orgweb= will tangle the two files =/my/project/folder/foo.org=
 and =/my/project/folder/bar.org=
 
 ** Detangle
 
-=weborg detangle= takes a =folder= as input. The =folder= is where the source
+=orgweb detangle= takes a =folder= as input. The =folder= is where the source
 files we want to detangle are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -179,16 +179,16 @@ the tangling markup in comments of the source file.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg detangle . --file=foo.py --file=bar.py
+orgweb detangle . --file=foo.py --file=bar.py
 
 #+end_src
 
-In that example, =weborg= will detangle the two files
+In that example, =orgweb= will detangle the two files
 =/my/project/folder/foo.py= and =/my/project/folder/bar.py=
 
 ** Execute
 
-=weborg execute= takes a =folder= as input. The =folder= is where the Org files
+=orgweb execute= takes a =folder= as input. The =folder= is where the Org files
 we want to execute are located. The operation is recursive, it will check in all
 subfolders of =folder=
 
@@ -204,15 +204,15 @@ that are referrenced within Org files.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg execute . --file=foo.org
+orgweb execute . --file=foo.org
 
 #+end_src
 
-In that example, =weborg= will execute the =/my/project/folder/foo.py=
+In that example, =orgweb= will execute the =/my/project/folder/foo.py=
 
 ** Monitor
 
-=weborg monitor= will take a folder as input and will monitor every file changes
+=orgweb monitor= will take a folder as input and will monitor every file changes
 in that directory, recursively. If a Org file changes, it will be tangled, if a
 source file changes it will be detangled.
 
@@ -224,7 +224,7 @@ every time they modify a file.
 #+begin_src shell :eval no
 
 cd /my/project/folder/
-weborg monitor .
+orgweb monitor .
 
 #+end_src
 
@@ -288,7 +288,7 @@ You can use =noweb= only if you won't =detangle= your source files.
 
 * Contributions
 
-We welcome contributions to WebOrg! If you’d like to contribute, please follow
+We welcome contributions to OrgWeb! If you’d like to contribute, please follow
 these steps:
 
   1. Fork the repository on GitHub.

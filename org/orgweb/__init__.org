@@ -1,0 +1,9 @@
+#+PROPERTY: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/__init__.py
+
+#+title: Init
+
+Define the current version of the =orgweb= command line tool.
+
+#+begin_src python
+__version__ = "0.0.2"
+#+end_src
