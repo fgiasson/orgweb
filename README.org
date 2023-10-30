@@ -39,11 +39,9 @@ process will install and configure all the components required to implement all
 process will happen any time that the image is not available in the environment.
 
 #+BEGIN_SRC plantuml :file imgs/orgweb.svg :exports results
-
 OrgWeb -> Docker: Command
 Docker -> Image: Build Image
 Image -> Emacs: Install & Configure
-
 #+END_SRC
 
 #+RESULTS:
@@ -60,13 +58,11 @@ Every time a =orgweb= command line is executed, a new container is created:
 
 
 #+BEGIN_SRC plantuml :file imgs/orgweb_2.svg :exports results
-
 OrgWeb -> Docker: Run Container
 Docker -> Container: Create Container
 Image <-- Container: Uses
 OrgWeb -> Emacs: Execute Command
 Docker -> Container: Deletes
-
 #+END_SRC
 
 #+RESULTS:
@@ -153,10 +149,8 @@ Optionally, one or multiple files can be listed. Those files are located in
 If no file is mentioned, then all the Org files from =folder= will be tangled.
 
 #+begin_src shell :eval no
-
 cd /my/project/folder/
 orgweb tangle . --file=foo.org --file=bar.org
-
 #+end_src
 
 In that example, =orgweb= will tangle the two files =/my/project/folder/foo.org=
@@ -178,10 +172,8 @@ was previously tangled. Otherwise, it will be ignored. It does so by checking
 the tangling markup in comments of the source file.
 
 #+begin_src shell :eval no
-
 cd /my/project/folder/
 orgweb detangle . --file=foo.py --file=bar.py
-
 #+end_src
 
 In that example, =orgweb= will detangle the two files
@@ -203,10 +195,8 @@ is normally used to execute PlantUML code blocks such that it produces graphs
 that are referrenced within Org files.
 
 #+begin_src shell :eval no
-
 cd /my/project/folder/
 orgweb execute . --file=foo.org
-
 #+end_src
 
 In that example, =orgweb= will execute the =/my/project/folder/foo.py=
@@ -223,10 +213,8 @@ every time they modify a file.
 
 
 #+begin_src shell :eval no
-
 cd /my/project/folder/
 orgweb monitor .
-
 #+end_src
 
 * Tangling Workflows
@@ -301,4 +289,3 @@ these steps:
   5. Submit a pull request to the main branch of the original repository.
   6. Make sure that you only commit the Org-mode files, and not the source files
      themselves. Add them to the =make clean= method if needed.
-
