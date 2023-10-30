@@ -124,6 +124,10 @@ class OrgFileChangeHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not os.path.isdir(event.src_path):
+
+            if orgweb_ignored(event.src_path, self.path):
+                return
+
             if self.queue.add_event(event):
                 if event.src_path.endswith(".org"):
                     print('File changed, tangling:', event.src_path)
