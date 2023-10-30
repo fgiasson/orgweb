@@ -14,7 +14,7 @@ exclude = [".env",
 
 [project]
 name = "orgweb"
-version = "0.0.4"
+version = "0.0.5"
 authors = [
   { name="Frederick Giasson", email="fred@fgiasson.com" },
 ]
