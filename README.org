@@ -3,10 +3,10 @@
 #+title: OrgWeb: CLI Org-Mode Environment for WEB like development without Emacs
 
 =orgweb= is intended for developers that want to create literate programming
-project using Org-mode, but that *does not* want to investing time to learn how
-to use Emacs and Org-mode. If you are a developer that already uses Emacs and
+project using Org-mode, but that *does not* want to invest time to learn how to
+use Emacs and Org-mode. If you are a developer that already uses Emacs and
 Org-mode, this tool is most likely not for you, but maybe for the people on your
-team that doesn't know, nor want to know, about Emacs.
+team that doesn't know, nor want to know, Emacs.
 
 =orgweb= is a very simple CLI tool that does the following:
 
@@ -19,7 +19,7 @@ team that doesn't know, nor want to know, about Emacs.
 [[https://fgiasson.com/blog/index.php/2023/08/28/what-is-literate-programming-why/][What is Literate Programming? Why?]]
 
 If you wonder what a Literate Programming project looks like, just poke around
-this repository to have a glimps of the potential.
+this repository to have a glimpse of the potential.
 
 * How does it work?
 
@@ -65,6 +65,7 @@ OrgWeb -> Docker: Run Container
 Docker -> Container: Create Container
 Image <-- Container: Uses
 OrgWeb -> Emacs: Execute Command
+Docker -> Container: Deletes
 
 #+END_SRC
 
@@ -255,7 +256,7 @@ This is the workflow that is currently implemented in Org-mode. You can tangle a
 =foo.org= file in as many source files you want. Then, if you just detangle
 =Foo.py=, then only the code blocks with that code will be updated in =Foo.org=.
 
-Then you could extrapolite this case and think about the following scenario:
+Then you could extrapolate this case and think about the following scenario:
 
 #+BEGIN_SRC plantuml :file imgs/graph_2.svg :exports results
 digraph foo {
