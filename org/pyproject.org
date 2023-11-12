@@ -8,13 +8,20 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
+namespaces = true
 exclude = [".env",
            "tests*",
            "org"]
+# where = ["orgweb"]
+
+[tool.setuptools.package-data]
+orgweb = ["Dockerfile"]
+"orgweb.resources" = ["install.el",
+                      "site-start.el"]
 
 [project]
 name = "orgweb"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
   { name="Frederick Giasson", email="fred@fgiasson.com" },
 ]

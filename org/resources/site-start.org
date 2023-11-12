@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../resources/site-start.el
+#+PROPERTY: header-args :results silent :comments link :mkdirp yes :eval no :tangle ../../orgweb/resources/site-start.el
 
 #+TITLE: Emacs Site Start Init Script
 

@@ -88,9 +88,7 @@ clean:
 	rm -rf orgweb.egg-info
 	rm -rf org/orgweb/__pycache__
 	rm -rf orgweb
-	rm -rf resources
 	rm -rf .mypy_cache
-	rm Dockerfile
 	rm pyproject.toml
 #+end_src
 

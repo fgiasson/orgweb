@@ -12,6 +12,7 @@ We use thew [[https://github.com/docker/docker-py][python-py]] project.
 
 #+begin_src python
 import docker
+import os
 from docker.errors import ImageNotFound, NotFound
 #+end_src
 
@@ -21,6 +22,23 @@ Initialize the docker object from the computer's environment.
 
 #+begin_src python
 docker = docker.from_env()
+#+end_src
+
+* Package Directory
+
+=orgweb= package does contain the Dockerfiler used to create the Docker image
+necessary for OrgWeb. We need to get the actual folder, on the file system of
+the packge to point Docker to the Dockerfile to use to create the image.
+
+#+begin_src python
+def get_package_directory():
+    # Get the path of the current script
+    current_script_path = os.path.realpath(__file__)
+
+    # Get the directory of the current script
+    current_directory = os.path.dirname(current_script_path)
+
+    return current_directory
 #+end_src
 
 * Images Utility Functions
@@ -35,9 +53,8 @@ automatically using this function.
 #+begin_src python
 def build_image(img: str='localbuild:orgweb') -> None:
     """Build the orgweb image from the Dockerfile. Returns <image, logs>"""
-    image, logs = docker.images.build(path='.', tag=img, rm=True)
+    image, logs = docker.images.build(path=get_package_directory(), tag=img, rm=True)
     return image, logs
-
 
 def image_exists(img: str='localbuild:orgweb') -> bool:
     """Check if the orgweb image exists in the Docker environment"""
