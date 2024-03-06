@@ -21,7 +21,7 @@ orgweb = ["Dockerfile"]
 
 [project]
 name = "orgweb"
-version = "0.0.6"
+version = "0.0.7"
 authors = [
   { name="Frederick Giasson", email="fred@fgiasson.com" },
 ]
