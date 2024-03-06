@@ -115,8 +115,8 @@ development environment and the package to run locally.
 
 #+begin_src shell :eval no
 make create-venv          # create the pyenv virtual environment
-make install-build        # install Python's build
 source .venv/bin/activate # source that environment
+make install-build        # install Python's build
 make build                # build the orgweb CLI application
 make install-local-build  # install the package we just created
 #+end_src
