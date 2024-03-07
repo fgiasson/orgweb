@@ -43,7 +43,6 @@ Start Typer such that we end-up with a command line utility.
 app = typer.Typer()
 #+end_src
 
-
 * Version Command
 
 Gives the version of the currently installed =orgweb= in the environment.
