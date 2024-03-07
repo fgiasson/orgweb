@@ -89,6 +89,7 @@ clean:
 	rm -rf org/orgweb/__pycache__
 	rm -rf orgweb
 	rm -rf .mypy_cache
+	rm Makefile
 	rm pyproject.toml
 #+end_src
 
