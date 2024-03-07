@@ -56,18 +56,6 @@ def version():
     print(f"Version: {__version__}")
 #+end_src
 
-* Config Command
-
-Gives the list of environment variables configurations available to configure
-=orgweb= and their current values.
-
-#+begin_src python
-@app.command()
-def config():
-    """Get the current configuration of orgweb"""
-    # print(f"DOCS_PATH: {os.environ.get('DOCS_PATH')}")
-#+end_src
-
 * Tangle Command
 
 =orgweb tangle= takes a =folder= as input. The =folder= is where the Org files
