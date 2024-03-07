@@ -68,7 +68,6 @@ Docker -> Container: Deletes
 #+RESULTS:
 [[file:imgs/orgweb_2.svg]]
 
-
 * Installing
 ** Docker
 
@@ -125,7 +124,6 @@ After that, you will be able to run =make rebuid-local= every time you want to
 test some changes you made to the application.
 
 * Usage
-
 ** Folder Structure
 
 Each of the operation work with the same folder structure assumption. There are three main components:
